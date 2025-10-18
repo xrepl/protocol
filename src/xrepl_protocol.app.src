@@ -12,5 +12,6 @@
     {licenses, ["Apache-2.0"]},
     {links, [
         {"GitHub", "https://github.com/lfex/xrepl-protocol"}
-    ]}
+    ]},
+    {exclude_files, ["priv/.DS_Store", "priv/images/*"]}
 ]}.
