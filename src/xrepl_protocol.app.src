@@ -1,6 +1,6 @@
 {application, xrepl_protocol, [
     {description, "Wire protocol definitions and encoding/decoding utilities for xrepl communications"},
-    {vsn, "0.1.0"},
+    {vsn, "0.2.0"},
     {registered, []},
     {applications, [
         kernel,
