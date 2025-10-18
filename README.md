@@ -48,8 +48,8 @@ Apache 2.0
 
 [//]: ---Named-Links---
 
-[logo]: priv/images/logo-v1-x250.png
-[logo-large]: priv/images/logo-v1-x4800.png
+[logo]: https://raw.githubusercontent.com/xrepl/xrepl/refs/heads/main/priv/images/logo-v1-x250.png
+[logo-large]: https://raw.githubusercontent.com/xrepl/xrepl/refs/heads/main/priv/images/logo-v1-x4800.png
 [gh-actions-badge]: https://github.com/xrepl/protocol/actions/workflows/cicd.yml/badge.svg
 [gh-actions]: https://github.com/xrepl/protocol/actions/workflows/cicd.yml
 [lfe]: https://github.com/lfe/lfe
