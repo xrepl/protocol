@@ -490,70 +490,70 @@
 
 (deftest hot-reload-request-msgpack-roundtrip
   (let* ((req (xrepl-ops-beam:hot-reload-request `#m(modules ,(list "foo" "bar"))))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"hot_reload" (maps:get #"op" decoded))
     (is-equal (list #"foo" #"bar") (maps:get #"modules" decoded))
     (is-equal (list #"foo" #"bar") (maps:get #"module" decoded))))
 
 (deftest list-processes-request-msgpack-roundtrip
   (let* ((req (xrepl-ops-beam:list-processes-request #m(details true)))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"list_processes" (maps:get #"op" decoded))
     (is-equal 'true (maps:get #"details" decoded))))
 
 (deftest inspect-process-request-msgpack-roundtrip
   (let* ((req (xrepl-ops-beam:inspect-process-request #m(pid "<0.42.0>")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"inspect_process" (maps:get #"op" decoded))
     (is-equal #"<0.42.0>" (maps:get #"pid" decoded))
     (is-equal #"<0.42.0>" (maps:get #"process" decoded))))
 
 (deftest trace-calls-request-msgpack-roundtrip
   (let* ((req (xrepl-ops-beam:trace-calls-request #m(module "mymodule" action "start")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"trace_calls" (maps:get #"op" decoded))
     (is-equal #"mymodule" (maps:get #"module" decoded))
     (is-equal #"start" (maps:get #"action" decoded))))
 
 (deftest system-info-request-msgpack-roundtrip
   (let* ((req (xrepl-ops-beam:system-info-request `#m(keys ,(list "schedulers" "memory"))))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"system_info" (maps:get #"op" decoded))
     (is-equal (list #"schedulers" #"memory") (maps:get #"keys" decoded))))
 
 (deftest observer-data-request-msgpack-roundtrip
   (let* ((req (xrepl-ops-beam:observer-data-request #m(data_type "processes")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"observer_data" (maps:get #"op" decoded))
     (is-equal #"processes" (maps:get #"data_type" decoded))
     (is-equal #"processes" (maps:get #"type" decoded))))
 
 (deftest hot-reload-response-msgpack-roundtrip
   (let* ((resp (xrepl-ops-beam:hot-reload-response `#m(reloaded ,(list #"foo" #"bar"))))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal (list #"foo" #"bar") (maps:get #"reloaded" decoded))))
 
 (deftest list-processes-response-msgpack-roundtrip
   (let* ((resp (xrepl-ops-beam:list-processes-response
                  `#m(processes ,(list `#m(pid #"<0.42.0>" status #"waiting")))))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal 1 (length (maps:get #"processes" decoded)))))
 
 (deftest inspect-process-response-msgpack-roundtrip
   (let* ((resp (xrepl-ops-beam:inspect-process-response
                  `#m(pid #"<0.42.0>" info ,#m(status #"waiting" heap_size 610))))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal #"<0.42.0>" (maps:get #"pid" decoded))
     (let ((info (maps:get #"info" decoded)))
@@ -563,8 +563,8 @@
 (deftest trace-calls-response-msgpack-roundtrip
   (let* ((resp (xrepl-ops-beam:trace-calls-response
                  #m(trace_id #"trace-123" matched 5 traced 2)))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal #"trace-123" (maps:get #"trace_id" decoded))
     (is-equal 5 (maps:get #"matched" decoded))
@@ -573,8 +573,8 @@
 (deftest system-info-response-msgpack-roundtrip
   (let* ((resp (xrepl-ops-beam:system-info-response
                  `#m(info ,#m(schedulers 8 process_count 1234))))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (let ((info (maps:get #"info" decoded)))
       (is-equal 8 (maps:get #"schedulers" info))
@@ -585,8 +585,8 @@
                  `#m(data_type #"processes"
                      data ,(list `#m(pid #"<0.42.0>" memory 1234))
                      timestamp 1234567890)))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal #"processes" (maps:get #"data_type" decoded))
     (is-equal #"processes" (maps:get #"type" decoded))

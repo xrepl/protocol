@@ -284,8 +284,8 @@
 (deftest set-breakpoint-round-trip
   (let* ((req (xrepl-ops-debugging:set-breakpoint-request
               #m(file "src/foo.lfe" line 42 condition "x > 5" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"set_breakpoint" (maps:get #"op" decoded))
     (is-equal #"src/foo.lfe" (maps:get #"file" decoded))
     (is-equal 42 (maps:get #"line" decoded))
@@ -298,15 +298,15 @@
                       (maps:put #"file" #"src/foo.lfe"
                                (maps:put #"line" 42 #m()))))
          (resp (xrepl-ops-debugging:set-breakpoint-response bp))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal bp (maps:get #"breakpoint" decoded))))
 
 (deftest clear-breakpoint-round-trip
   (let* ((req (xrepl-ops-debugging:clear-breakpoint-request #m(id "bp-1" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"clear_breakpoint" (maps:get #"op" decoded))
     (is-equal #"bp-1" (maps:get #"id" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
@@ -315,16 +315,16 @@
 (deftest clear-breakpoint-response-round-trip
   (let* ((result (maps:put #"id" #"bp-1" (maps:put #"cleared" 'true #m())))
          (resp (xrepl-ops-debugging:clear-breakpoint-response result))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal #"bp-1" (maps:get #"id" (maps:get #"result" decoded)))
     (is-equal 'true (maps:get #"cleared" (maps:get #"result" decoded)))))
 
 (deftest list-breakpoints-round-trip
   (let* ((req (xrepl-ops-debugging:list-breakpoints-request #m(session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"list_breakpoints" (maps:get #"op" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
     (is (xrepl-ops-debugging:valid-request? decoded))))
@@ -332,15 +332,15 @@
 (deftest list-breakpoints-response-round-trip
   (let* ((breakpoints (list #m(#"id" #"bp-1" #"file" #"src/foo.lfe" #"line" 42)))
          (resp (xrepl-ops-debugging:list-breakpoints-response breakpoints))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal breakpoints (maps:get #"breakpoints" decoded))))
 
 (deftest stacktrace-round-trip
   (let* ((req (xrepl-ops-debugging:stacktrace-request #m(session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"stacktrace" (maps:get #"op" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
     (is (xrepl-ops-debugging:valid-request? decoded))))
@@ -348,15 +348,15 @@
 (deftest stacktrace-response-round-trip
   (let* ((frames (list #m(#"function" #"foo/2" #"file" #"src/foo.lfe" #"line" 42)))
          (resp (xrepl-ops-debugging:stacktrace-response frames))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal frames (maps:get #"frames" decoded))))
 
 (deftest inspect-locals-round-trip
   (let* ((req (xrepl-ops-debugging:inspect-locals-request #m(frame 2 session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"inspect_locals" (maps:get #"op" decoded))
     (is-equal 2 (maps:get #"frame" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
@@ -365,16 +365,16 @@
 (deftest inspect-locals-response-round-trip
   (let* ((locals #m(#"x" 42 #"y" #"hello"))
          (resp (xrepl-ops-debugging:inspect-locals-response locals))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal locals (maps:get #"locals" decoded))))
 
 (deftest eval-in-frame-round-trip
   (let* ((req (xrepl-ops-debugging:eval-in-frame-request
               #m(code "x + y" frame 2 session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"eval_in_frame" (maps:get #"op" decoded))
     (is-equal #"x + y" (maps:get #"code" decoded))
     (is-equal 2 (maps:get #"frame" decoded))
@@ -383,15 +383,15 @@
 
 (deftest eval-in-frame-response-round-trip
   (let* ((resp (xrepl-ops-debugging:eval-in-frame-response "47"))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal #"47" (maps:get #"value" decoded))))
 
 (deftest step-round-trip
   (let* ((req (xrepl-ops-debugging:step-request #m(type "into" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"step" (maps:get #"op" decoded))
     (is-equal #"into" (maps:get #"type" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
@@ -400,7 +400,7 @@
 (deftest step-response-round-trip
   (let* ((result #m(#"file" #"src/foo.lfe" #"line" 43))
          (resp (xrepl-ops-debugging:step-response result))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal result (maps:get #"result" decoded))))

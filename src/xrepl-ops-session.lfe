@@ -50,7 +50,7 @@
   Returns:
     Response message map with binary keys"
   (maps:put #"status" #"done"
-           (maps:put #"new_session" (xrepl-protocol-types:ensure-binary new-session-id)
+           (maps:put #"new_session" (xrepl-ptcl-types:ensure-binary new-session-id)
                     #m())))
 
 ;;; close operation
@@ -71,7 +71,7 @@
   Returns:
     Request message map with binary keys"
   (maps:put #"op" #"close"
-           (maps:put #"session" (xrepl-protocol-types:ensure-binary session-id)
+           (maps:put #"session" (xrepl-ptcl-types:ensure-binary session-id)
                     #m())))
 
 (defun close-response ()
@@ -122,12 +122,12 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'namespace)
+  (case (xrepl-ptcl-types:get-required opts 'namespace)
     (`#(ok ,namespace)
      (let* ((base (maps:put #"op" #"switch_namespace"
-                           (maps:put #"namespace" (xrepl-protocol-types:ensure-binary namespace)
+                           (maps:put #"namespace" (xrepl-ptcl-types:ensure-binary namespace)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -141,7 +141,7 @@
   Returns:
     Response message map"
   (maps:put #"status" #"done"
-           (maps:put #"namespace" (xrepl-protocol-types:ensure-binary namespace)
+           (maps:put #"namespace" (xrepl-ptcl-types:ensure-binary namespace)
                     #m())))
 
 ;;; session_info operation
@@ -154,10 +154,10 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'session)
+  (case (xrepl-ptcl-types:get-required opts 'session)
     (`#(ok ,session)
      (maps:put #"op" #"session_info"
-              (maps:put #"session" (xrepl-protocol-types:ensure-binary session)
+              (maps:put #"session" (xrepl-ptcl-types:ensure-binary session)
                        #m())))
     (error error)))
 
@@ -183,10 +183,10 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'session)
+  (case (xrepl-ptcl-types:get-required opts 'session)
     (`#(ok ,session)
      (maps:put #"op" #"clear_session"
-              (maps:put #"session" (xrepl-protocol-types:ensure-binary session)
+              (maps:put #"session" (xrepl-ptcl-types:ensure-binary session)
                        #m())))
     (error error)))
 
@@ -214,12 +214,12 @@
   Returns:
     Request message map"
   ;; Try both 'commands' and 'history' field names
-  (let ((cmds (xrepl-protocol-types:get-field-any opts '(commands history) 'undefined)))
+  (let ((cmds (xrepl-ptcl-types:get-field-any opts '(commands history) 'undefined)))
     (if (== cmds 'undefined)
       (tuple 'error (tuple 'missing-required-field 'commands))
-      (let* ((base (xrepl-protocol-types:put-aliased-list #m() 'commands 'history cmds))
+      (let* ((base (xrepl-ptcl-types:put-aliased-list #m() 'commands 'history cmds))
              (with-op (maps:put #"op" #"upload_history" base))
-             (with-session (xrepl-protocol-types:maybe-put-aliased
+             (with-session (xrepl-ptcl-types:maybe-put-aliased
                             with-op 'session 'session opts 'session)))
         with-session))))
 
@@ -235,7 +235,7 @@
   (let* ((base (maps:put #"status" #"done"
                         (maps:put #"uploaded" uploaded-count
                                  #m())))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                         base 'session 'session opts 'session)))
     with-session))
 
@@ -250,7 +250,7 @@
   Returns:
     #(ok parsed-request) | #(error reason)"
   (try
-    (let ((op (xrepl-protocol-types:get-field message 'op)))
+    (let ((op (xrepl-ptcl-types:get-field message 'op)))
       (cond
         ;; clone operation
         ((or (== op #"clone") (== op 'clone))
@@ -260,7 +260,7 @@
         ((or (== op #"close") (== op 'close))
          (tuple 'ok (maps:put #"op" #"close"
                              (maps:put #"session"
-                                      (xrepl-protocol-types:get-field message 'session 'undefined)
+                                      (xrepl-ptcl-types:get-field message 'session 'undefined)
                                       #m()))))
 
         ;; ls_sessions operation
@@ -269,18 +269,18 @@
 
         ;; switch_namespace operation
         ((or (== op #"switch_namespace") (== op 'switch_namespace))
-         (let ((namespace (xrepl-protocol-types:get-field message 'namespace)))
+         (let ((namespace (xrepl-ptcl-types:get-field message 'namespace)))
            (if (== namespace 'undefined)
              (tuple 'error 'missing-namespace)
              (tuple 'ok (maps:put #"op" #"switch_namespace"
                                  (maps:put #"namespace" namespace
                                           (maps:put #"session"
-                                                   (xrepl-protocol-types:get-field message 'session 'undefined)
+                                                   (xrepl-ptcl-types:get-field message 'session 'undefined)
                                                    #m())))))))
 
         ;; session_info operation
         ((or (== op #"session_info") (== op 'session_info))
-         (let ((session (xrepl-protocol-types:get-field message 'session)))
+         (let ((session (xrepl-ptcl-types:get-field message 'session)))
            (if (== session 'undefined)
              (tuple 'error 'missing-session)
              (tuple 'ok (maps:put #"op" #"session_info"
@@ -288,7 +288,7 @@
 
         ;; clear_session operation
         ((or (== op #"clear_session") (== op 'clear_session))
-         (let ((session (xrepl-protocol-types:get-field message 'session)))
+         (let ((session (xrepl-ptcl-types:get-field message 'session)))
            (if (== session 'undefined)
              (tuple 'error 'missing-session)
              (tuple 'ok (maps:put #"op" #"clear_session"
@@ -297,13 +297,13 @@
         ;; upload_history operation
         ((or (== op #"upload_history") (== op 'upload_history))
          ;; Try both 'commands' and 'history' field names
-         (let ((commands (xrepl-protocol-types:get-field-any message '(commands history))))
+         (let ((commands (xrepl-ptcl-types:get-field-any message '(commands history))))
            (if (or (== commands 'undefined) (not (is_list commands)))
              (tuple 'error 'missing-commands)
              (tuple 'ok (maps:put #"op" #"upload_history"
                                  (maps:put #"commands" commands
                                           (maps:put #"session"
-                                                   (xrepl-protocol-types:get-field message 'session 'undefined)
+                                                   (xrepl-ptcl-types:get-field message 'session 'undefined)
                                                    #m())))))))
 
         ;; Invalid operation
@@ -321,9 +321,9 @@
 
   Returns:
     #(ok result-map) | #(error error-info)"
-  (let* ((status (xrepl-protocol-types:get-field message 'status))
+  (let* ((status (xrepl-ptcl-types:get-field message 'status))
          ;; Normalize op to binary for comparison
-         (norm-op (if (is_binary op) op (xrepl-protocol-types:ensure-binary-key op))))
+         (norm-op (if (is_binary op) op (xrepl-ptcl-types:ensure-binary-key op))))
     (cond
       ;; Done status
       ((or (== status #"done") (== status 'done))
@@ -331,7 +331,7 @@
          ;; clone response
          ((== norm-op #"clone")
           (tuple 'ok (maps:put #"new_session"
-                              (xrepl-protocol-types:get-field message 'new_session)
+                              (xrepl-ptcl-types:get-field message 'new_session)
                               #m())))
 
          ;; close response
@@ -341,40 +341,40 @@
          ;; ls_sessions response
          ((== norm-op #"ls_sessions")
           (tuple 'ok (maps:put #"sessions"
-                              (xrepl-protocol-types:get-field message 'sessions)
+                              (xrepl-ptcl-types:get-field message 'sessions)
                               #m())))
 
          ;; switch_namespace response
          ((== norm-op #"switch_namespace")
           (tuple 'ok (maps:put #"namespace"
-                              (xrepl-protocol-types:get-field message 'namespace)
+                              (xrepl-ptcl-types:get-field message 'namespace)
                               #m())))
 
          ;; session_info response
          ((== norm-op #"session_info")
           (tuple 'ok (maps:put #"session"
-                              (xrepl-protocol-types:get-field message 'session)
+                              (xrepl-ptcl-types:get-field message 'session)
                               #m())))
 
          ;; clear_session response
          ((== norm-op #"clear_session")
           (tuple 'ok (maps:put #"cleared"
-                              (xrepl-protocol-types:get-field message 'cleared)
+                              (xrepl-ptcl-types:get-field message 'cleared)
                               #m())))
 
          ;; upload_history response
          ((== norm-op #"upload_history")
           (tuple 'ok (maps:put #"uploaded"
-                              (xrepl-protocol-types:get-field message 'uploaded)
+                              (xrepl-ptcl-types:get-field message 'uploaded)
                               (maps:put #"session"
-                                       (xrepl-protocol-types:get-field message 'session 'undefined)
+                                       (xrepl-ptcl-types:get-field message 'session 'undefined)
                                        #m()))))
 
          ('true (tuple 'error 'unknown-operation))))
 
       ;; Error status
       ((or (== status #"error") (== status 'error))
-       (tuple 'error (xrepl-protocol-types:get-field message 'error)))
+       (tuple 'error (xrepl-ptcl-types:get-field message 'error)))
 
       ;; Invalid status
       ('true (tuple 'error 'invalid-status)))))
@@ -400,7 +400,7 @@
 
   Returns:
     true | false"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (or (== status #"done")
         (== status 'done)
         (== status #"error")
@@ -417,4 +417,4 @@
 
   Returns:
     Error response map"
-  (xrepl-protocol-types:error-response error-type message))
+  (xrepl-ptcl-types:error-response error-type message))

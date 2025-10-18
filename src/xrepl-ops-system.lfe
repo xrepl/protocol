@@ -88,10 +88,10 @@
          ops '(eval clone close)
          transports '(tcp unix stdio)
          aux #m(current_ns \"user\")))"
-  (let* ((versions (xrepl-protocol-types:get-field opts 'versions #m()))
-         (ops (xrepl-protocol-types:get-field opts 'ops '()))
-         (transports (xrepl-protocol-types:get-field opts 'transports '()))
-         (aux (xrepl-protocol-types:get-field opts 'aux 'undefined))
+  (let* ((versions (xrepl-ptcl-types:get-field opts 'versions #m()))
+         (ops (xrepl-ptcl-types:get-field opts 'ops '()))
+         (transports (xrepl-ptcl-types:get-field opts 'transports '()))
+         (aux (xrepl-ptcl-types:get-field opts 'aux 'undefined))
          (base (maps:put #"status" #"done"
                         (maps:put #"versions" versions
                                  (maps:put #"ops" ops
@@ -128,8 +128,8 @@
                   #\"optional_fields\" '(#\"session\" #\"file\")))
          features #m(#\"hot_reload\" true
                      #\"debugging\" true)))"
-  (let ((ops (xrepl-protocol-types:get-field opts 'ops '()))
-        (features (xrepl-protocol-types:get-field opts 'features #m())))
+  (let ((ops (xrepl-ptcl-types:get-field opts 'ops '()))
+        (features (xrepl-ptcl-types:get-field opts 'features #m())))
     (maps:put #"status" #"done"
              (maps:put #"capabilities"
                       (maps:put #"ops" ops
@@ -171,10 +171,10 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'session)
+  (case (xrepl-ptcl-types:get-required opts 'session)
     (`#(ok ,session)
      (maps:put #"op" #"loaded_modules"
-              (maps:put #"session" (xrepl-protocol-types:ensure-binary session)
+              (maps:put #"session" (xrepl-ptcl-types:ensure-binary session)
                        #m())))
     (error error)))
 
@@ -205,12 +205,12 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'module)
+  (case (xrepl-ptcl-types:get-required opts 'module)
     (`#(ok ,module)
      (let* ((base (maps:put #"op" #"module_info"
-                           (maps:put #"module" (xrepl-protocol-types:ensure-binary module)
+                           (maps:put #"module" (xrepl-ptcl-types:ensure-binary module)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -245,7 +245,7 @@
   Returns:
     #(ok parsed-request) | #(error reason)"
   (try
-    (let ((op (xrepl-protocol-types:get-field message 'op)))
+    (let ((op (xrepl-ptcl-types:get-field message 'op)))
       (cond
         ;; ping operation
         ((or (== op #"ping") (== op 'ping))
@@ -265,7 +265,7 @@
 
         ;; loaded_modules operation
         ((or (== op #"loaded_modules") (== op 'loaded_modules))
-         (let ((session (xrepl-protocol-types:get-field message 'session)))
+         (let ((session (xrepl-ptcl-types:get-field message 'session)))
            (if (== session 'undefined)
              (tuple 'error 'missing-session)
              (tuple 'ok (maps:put #"op" #"loaded_modules"
@@ -273,13 +273,13 @@
 
         ;; module_info operation
         ((or (== op #"module_info") (== op 'module_info))
-         (let ((module (xrepl-protocol-types:get-field message 'module)))
+         (let ((module (xrepl-ptcl-types:get-field message 'module)))
            (if (== module 'undefined)
              (tuple 'error 'missing-module)
              (tuple 'ok (maps:put #"op" #"module_info"
                                  (maps:put #"module" module
                                           (maps:put #"session"
-                                                   (xrepl-protocol-types:get-field message 'session 'undefined)
+                                                   (xrepl-ptcl-types:get-field message 'session 'undefined)
                                                    #m())))))))
 
         ;; Invalid operation
@@ -297,9 +297,9 @@
 
   Returns:
     #(ok result-map) | #(error error-info)"
-  (let* ((status (xrepl-protocol-types:get-field message 'status))
+  (let* ((status (xrepl-ptcl-types:get-field message 'status))
          ;; Normalize op to binary for comparison
-         (norm-op (if (is_binary op) op (xrepl-protocol-types:ensure-binary-key op))))
+         (norm-op (if (is_binary op) op (xrepl-ptcl-types:ensure-binary-key op))))
     (cond
       ;; Done status
       ((or (== status #"done") (== status 'done))
@@ -307,50 +307,50 @@
          ;; ping response
          ((== norm-op #"ping")
           (tuple 'ok (maps:put #"pong"
-                              (xrepl-protocol-types:get-field message 'pong)
+                              (xrepl-ptcl-types:get-field message 'pong)
                               (maps:put #"timestamp"
-                                       (xrepl-protocol-types:get-field message 'timestamp)
+                                       (xrepl-ptcl-types:get-field message 'timestamp)
                                        #m()))))
 
          ;; describe response
          ((== norm-op #"describe")
           (tuple 'ok (maps:put #"versions"
-                              (xrepl-protocol-types:get-field message 'versions #m())
+                              (xrepl-ptcl-types:get-field message 'versions #m())
                               (maps:put #"ops"
-                                       (xrepl-protocol-types:get-field message 'ops '())
+                                       (xrepl-ptcl-types:get-field message 'ops '())
                                        (maps:put #"transports"
-                                                (xrepl-protocol-types:get-field message 'transports '())
+                                                (xrepl-ptcl-types:get-field message 'transports '())
                                                 #m())))))
 
          ;; capabilities response
          ((== norm-op #"capabilities")
           (tuple 'ok (maps:put #"capabilities"
-                              (xrepl-protocol-types:get-field message 'capabilities #m())
+                              (xrepl-ptcl-types:get-field message 'capabilities #m())
                               #m())))
 
          ;; version response
          ((== norm-op #"version")
           (tuple 'ok (maps:put #"versions"
-                              (xrepl-protocol-types:get-field message 'versions #m())
+                              (xrepl-ptcl-types:get-field message 'versions #m())
                               #m())))
 
          ;; loaded_modules response
          ((== norm-op #"loaded_modules")
           (tuple 'ok (maps:put #"modules"
-                              (xrepl-protocol-types:get-field message 'modules '())
+                              (xrepl-ptcl-types:get-field message 'modules '())
                               #m())))
 
          ;; module_info response
          ((== norm-op #"module_info")
           (tuple 'ok (maps:put #"module"
-                              (xrepl-protocol-types:get-field message 'module #m())
+                              (xrepl-ptcl-types:get-field message 'module #m())
                               #m())))
 
          ('true (tuple 'error 'unknown-operation))))
 
       ;; Error status
       ((or (== status #"error") (== status 'error))
-       (tuple 'error (xrepl-protocol-types:get-field message 'error)))
+       (tuple 'error (xrepl-ptcl-types:get-field message 'error)))
 
       ;; Invalid status
       ('true (tuple 'error 'invalid-status)))))
@@ -376,7 +376,7 @@
 
   Returns:
     true | false"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (or (== status #"done")
         (== status 'done)
         (== status #"error")
@@ -393,4 +393,4 @@
 
   Returns:
     Error response map"
-  (xrepl-protocol-types:error-response error-type message))
+  (xrepl-ptcl-types:error-response error-type message))

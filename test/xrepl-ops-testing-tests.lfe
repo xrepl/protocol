@@ -405,8 +405,8 @@
 (deftest roundtrip-test-run-request
   (let* ((req (xrepl-ops-testing:test-run-request
                #m(namespace "foo" pattern "*bar*")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"test_run" (maps:get #"op" decoded))
     (is-equal #"foo" (maps:get #"namespace" decoded))
     (is-equal #"*bar*" (maps:get #"pattern" decoded))))
@@ -416,8 +416,8 @@
                            (maps:put #"failed" 2
                                     (maps:put #"duration" 1.5 #m()))))
          (resp (xrepl-ops-testing:test-run-response results))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal results (maps:get #"results" decoded))
     ;; Verify aliases are preserved
@@ -426,8 +426,8 @@
 (deftest roundtrip-test-coverage-request
   (let* ((req (xrepl-ops-testing:test-coverage-request
                #m(namespace "foo" format "detailed")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"test_coverage" (maps:get #"op" decoded))
     (is-equal #"foo" (maps:get #"namespace" decoded))
     (is-equal #"detailed" (maps:get #"format" decoded))))
@@ -436,23 +436,23 @@
   (let* ((coverage (maps:put #"percentage" 85.5
                             (maps:put #"lines_covered" 342 #m())))
          (resp (xrepl-ops-testing:test-coverage-response coverage))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal coverage (maps:get #"coverage" decoded))))
 
 (deftest roundtrip-test-rerun-failures-request
   (let* ((req (xrepl-ops-testing:test-rerun-failures-request #m(session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"test_rerun_failures" (maps:get #"op" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))))
 
 (deftest roundtrip-test-rerun-failures-response
   (let* ((results (maps:put #"passed" 1 (maps:put #"failed" 1 #m())))
          (resp (xrepl-ops-testing:test-rerun-failures-response results))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal results (maps:get #"results" decoded))
     ;; Verify aliases are preserved
@@ -461,8 +461,8 @@
 (deftest roundtrip-generate-tests-request
   (let* ((req (xrepl-ops-testing:generate-tests-request
                #m(namespace "foo" function "bar" template "unit")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"generate_tests" (maps:get #"op" decoded))
     (is-equal #"foo" (maps:get #"namespace" decoded))
     (is-equal #"bar" (maps:get #"function" decoded))
@@ -475,8 +475,8 @@
                              (maps:put #"code" #"(defun test-foo () ...)"
                                       (maps:put #"count" 3 #m()))))
          (resp (xrepl-ops-testing:generate-tests-response generated))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal generated (maps:get #"generated" decoded))))
 

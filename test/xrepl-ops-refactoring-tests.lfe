@@ -415,8 +415,8 @@
 (deftest roundtrip-rename-symbol-request
   (let* ((req (xrepl-ops-refactoring:rename-symbol-request
                #m(symbol "foo" new_name "bar" file "test.lfe")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"rename_symbol" (maps:get #"op" decoded))
     (is-equal #"foo" (maps:get #"symbol" decoded))
     (is-equal #"foo" (maps:get #"old_name" decoded))
@@ -427,16 +427,16 @@
   (let* ((changes (maps:put #"files_changed" 3
                            (maps:put #"total_edits" 12 #m())))
          (resp (xrepl-ops-refactoring:rename-symbol-response changes))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal changes (maps:get #"changes" decoded))))
 
 (deftest roundtrip-extract-function-request
   (let* ((req (xrepl-ops-refactoring:extract-function-request
                #m(code "(+ x y)" function_name "add-nums" line 10)))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"extract_function" (maps:get #"op" decoded))
     (is-equal #"(+ x y)" (maps:get #"code" decoded))
     (is-equal #"(+ x y)" (maps:get #"selection" decoded))
@@ -449,16 +449,16 @@
   (let* ((result (maps:put #"function" #"(defun add-nums (x y) (+ x y))"
                           (maps:put #"modified_code" #"(add-nums 1 2)" #m())))
          (resp (xrepl-ops-refactoring:extract-function-response result))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal result (maps:get #"result" decoded))))
 
 (deftest roundtrip-inline-function-request
   (let* ((req (xrepl-ops-refactoring:inline-function-request
                #m(function "foo" file "test.lfe")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"inline_function" (maps:get #"op" decoded))
     (is-equal #"foo" (maps:get #"function" decoded))
     (is-equal #"foo" (maps:get #"symbol" decoded))
@@ -468,8 +468,8 @@
   (let* ((result (maps:put #"files_changed" 2
                           (maps:put #"total_edits" 5 #m())))
          (resp (xrepl-ops-refactoring:inline-function-response result))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal result (maps:get #"result" decoded))))
 

@@ -43,22 +43,22 @@
     (test-run-request #m(pattern \"*foo*\" session \"s1\"))
     (test-run-request #m(tests (list \"test1\" \"test2\")))"
   (let* ((base (maps:put #"op" #"test_run" #m()))
-         (with-ns (case (xrepl-protocol-types:get-field opts 'namespace 'undefined)
+         (with-ns (case (xrepl-ptcl-types:get-field opts 'namespace 'undefined)
                    ('undefined base)
                    (ns (maps:put #"namespace"
-                                (xrepl-protocol-types:ensure-binary ns)
+                                (xrepl-ptcl-types:ensure-binary ns)
                                 base))))
-         (with-pattern (case (xrepl-protocol-types:get-field opts 'pattern 'undefined)
+         (with-pattern (case (xrepl-ptcl-types:get-field opts 'pattern 'undefined)
                         ('undefined with-ns)
                         (pat (maps:put #"pattern"
-                                      (xrepl-protocol-types:ensure-binary pat)
+                                      (xrepl-ptcl-types:ensure-binary pat)
                                       with-ns))))
-         (with-tests (case (xrepl-protocol-types:get-field-any opts '(tests test_names))
+         (with-tests (case (xrepl-ptcl-types:get-field-any opts '(tests test_names))
                       ('undefined with-pattern)
-                      (tests (xrepl-protocol-types:put-aliased-list
+                      (tests (xrepl-ptcl-types:put-aliased-list
                              with-pattern 'tests 'test_names
-                             (lists:map #'xrepl-protocol-types:ensure-binary/1 tests)))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+                             (lists:map #'xrepl-ptcl-types:ensure-binary/1 tests)))))
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        with-tests 'session 'session opts 'session)))
     with-session))
 
@@ -78,7 +78,7 @@
                           #\"duration\" 1.5
                           #\"failures\" (list #m(#\"test\" #\"foo\"
                                                  #\"message\" #\"expected 1\"))))"
-  (xrepl-protocol-types:put-aliased
+  (xrepl-ptcl-types:put-aliased
    (maps:put #"status" #"done" #m())
    'results 'test_results results))
 
@@ -100,17 +100,17 @@
     (test-coverage-request #m(namespace \"my-module\"))
     (test-coverage-request #m(format \"detailed\" session \"s1\"))"
   (let* ((base (maps:put #"op" #"test_coverage" #m()))
-         (with-ns (case (xrepl-protocol-types:get-field opts 'namespace 'undefined)
+         (with-ns (case (xrepl-ptcl-types:get-field opts 'namespace 'undefined)
                    ('undefined base)
                    (ns (maps:put #"namespace"
-                                (xrepl-protocol-types:ensure-binary ns)
+                                (xrepl-ptcl-types:ensure-binary ns)
                                 base))))
-         (with-format (case (xrepl-protocol-types:get-field opts 'format 'undefined)
+         (with-format (case (xrepl-ptcl-types:get-field opts 'format 'undefined)
                        ('undefined with-ns)
                        (fmt (maps:put #"format"
-                                     (xrepl-protocol-types:ensure-binary fmt)
+                                     (xrepl-ptcl-types:ensure-binary fmt)
                                      with-ns))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        with-format 'session 'session opts 'session)))
     with-session))
 
@@ -147,7 +147,7 @@
     (test-rerun-failures-request #m())
     (test-rerun-failures-request #m(session \"s1\"))"
   (let* ((base (maps:put #"op" #"test_rerun_failures" #m()))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        base 'session 'session opts 'session)))
     with-session))
 
@@ -164,7 +164,7 @@
     (test-rerun-failures-response #m(#\"passed\" 1
                                      #\"failed\" 1
                                      #\"duration\" 0.5))"
-  (xrepl-protocol-types:put-aliased
+  (xrepl-ptcl-types:put-aliased
    (maps:put #"status" #"done" #m())
    'results 'test_results results))
 
@@ -186,23 +186,23 @@
     (generate-tests-request #m(namespace \"my-module\"))
     (generate-tests-request #m(namespace \"foo\" function \"bar\"))
     (generate-tests-request #m(namespace \"baz\" template \"property\"))"
-  (case (xrepl-protocol-types:get-required opts 'namespace)
+  (case (xrepl-ptcl-types:get-required opts 'namespace)
     (`#(ok ,ns)
      (let* ((base (maps:put #"op" #"generate_tests"
                            (maps:put #"namespace"
-                                    (xrepl-protocol-types:ensure-binary ns)
+                                    (xrepl-ptcl-types:ensure-binary ns)
                                     #m())))
-            (with-fn (case (xrepl-protocol-types:get-field-any opts '(function function_name))
+            (with-fn (case (xrepl-ptcl-types:get-field-any opts '(function function_name))
                       ('undefined base)
-                      (fn (xrepl-protocol-types:put-aliased
+                      (fn (xrepl-ptcl-types:put-aliased
                           base 'function 'function_name
-                          (xrepl-protocol-types:ensure-binary fn)))))
-            (with-template (case (xrepl-protocol-types:get-field opts 'template 'undefined)
+                          (xrepl-ptcl-types:ensure-binary fn)))))
+            (with-template (case (xrepl-ptcl-types:get-field opts 'template 'undefined)
                             ('undefined with-fn)
                             (tmpl (maps:put #"template"
-                                           (xrepl-protocol-types:ensure-binary tmpl)
+                                           (xrepl-ptcl-types:ensure-binary tmpl)
                                            with-fn))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-template 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -233,14 +233,14 @@
 
   Returns:
     #(ok parsed-message) or #(error reason)"
-  (let ((op (xrepl-protocol-types:get-field message 'op)))
+  (let ((op (xrepl-ptcl-types:get-field message 'op)))
     (cond
       ;; test_run
       ((or (== op #"test_run") (== op 'test_run))
-       (let ((namespace (xrepl-protocol-types:get-field message 'namespace))
-             (pattern (xrepl-protocol-types:get-field message 'pattern))
-             (tests (xrepl-protocol-types:get-field-any message '(tests test_names)))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((namespace (xrepl-ptcl-types:get-field message 'namespace))
+             (pattern (xrepl-ptcl-types:get-field message 'pattern))
+             (tests (xrepl-ptcl-types:get-field-any message '(tests test_names)))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (tuple 'ok (maps:put #"op" #"test_run"
                              (maps:put #"namespace" namespace
                                       (maps:put #"pattern" pattern
@@ -249,9 +249,9 @@
 
       ;; test_coverage
       ((or (== op #"test_coverage") (== op 'test_coverage))
-       (let ((namespace (xrepl-protocol-types:get-field message 'namespace))
-             (format (xrepl-protocol-types:get-field message 'format))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((namespace (xrepl-ptcl-types:get-field message 'namespace))
+             (format (xrepl-ptcl-types:get-field message 'format))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (tuple 'ok (maps:put #"op" #"test_coverage"
                              (maps:put #"namespace" namespace
                                       (maps:put #"format" format
@@ -259,16 +259,16 @@
 
       ;; test_rerun_failures
       ((or (== op #"test_rerun_failures") (== op 'test_rerun_failures))
-       (let ((session (xrepl-protocol-types:get-field message 'session)))
+       (let ((session (xrepl-ptcl-types:get-field message 'session)))
          (tuple 'ok (maps:put #"op" #"test_rerun_failures"
                              (maps:put #"session" session #m())))))
 
       ;; generate_tests
       ((or (== op #"generate_tests") (== op 'generate_tests))
-       (let ((namespace (xrepl-protocol-types:get-field message 'namespace))
-             (function (xrepl-protocol-types:get-field-any message '(function function_name)))
-             (template (xrepl-protocol-types:get-field message 'template))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((namespace (xrepl-ptcl-types:get-field message 'namespace))
+             (function (xrepl-ptcl-types:get-field-any message '(function function_name)))
+             (template (xrepl-ptcl-types:get-field message 'template))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (== namespace 'undefined)
            (tuple 'error 'missing-namespace)
            (tuple 'ok (maps:put #"op" #"generate_tests"
@@ -290,29 +290,29 @@
 
   Returns:
     #(ok parsed-response) or #(error reason)"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (cond
       ;; test_run response
       ((or (== op #"test_run") (== op 'test_run))
-       (let ((results (xrepl-protocol-types:get-field-any message '(results test_results))))
+       (let ((results (xrepl-ptcl-types:get-field-any message '(results test_results))))
          (tuple 'ok (maps:put #"status" status
                              (maps:put #"results" results #m())))))
 
       ;; test_coverage response
       ((or (== op #"test_coverage") (== op 'test_coverage))
-       (let ((coverage (xrepl-protocol-types:get-field message 'coverage)))
+       (let ((coverage (xrepl-ptcl-types:get-field message 'coverage)))
          (tuple 'ok (maps:put #"status" status
                              (maps:put #"coverage" coverage #m())))))
 
       ;; test_rerun_failures response
       ((or (== op #"test_rerun_failures") (== op 'test_rerun_failures))
-       (let ((results (xrepl-protocol-types:get-field-any message '(results test_results))))
+       (let ((results (xrepl-ptcl-types:get-field-any message '(results test_results))))
          (tuple 'ok (maps:put #"status" status
                              (maps:put #"results" results #m())))))
 
       ;; generate_tests response
       ((or (== op #"generate_tests") (== op 'generate_tests))
-       (let ((generated (xrepl-protocol-types:get-field message 'generated)))
+       (let ((generated (xrepl-ptcl-types:get-field message 'generated)))
          (tuple 'ok (maps:put #"status" status
                              (maps:put #"generated" generated #m())))))
 
@@ -330,7 +330,7 @@
 
   Returns:
     true if valid, false otherwise"
-  (let ((op (xrepl-protocol-types:get-field message 'op)))
+  (let ((op (xrepl-ptcl-types:get-field message 'op)))
     (cond
       ;; test_run: no required fields beyond op
       ((or (== op #"test_run") (== op 'test_run))
@@ -346,7 +346,7 @@
 
       ;; generate_tests: requires namespace
       ((or (== op #"generate_tests") (== op 'generate_tests))
-       (let ((namespace (xrepl-protocol-types:get-field message 'namespace)))
+       (let ((namespace (xrepl-ptcl-types:get-field message 'namespace)))
          (not (== namespace 'undefined))))
 
       ;; Unknown or missing op
@@ -361,29 +361,29 @@
 
   Returns:
     true if valid, false otherwise"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (cond
       ;; All responses require status
       ((== status 'undefined) 'false)
 
       ;; test_run: requires results
       ((or (== op #"test_run") (== op 'test_run))
-       (let ((results (xrepl-protocol-types:get-field-any message '(results test_results))))
+       (let ((results (xrepl-ptcl-types:get-field-any message '(results test_results))))
          (not (== results 'undefined))))
 
       ;; test_coverage: requires coverage
       ((or (== op #"test_coverage") (== op 'test_coverage))
-       (let ((coverage (xrepl-protocol-types:get-field message 'coverage)))
+       (let ((coverage (xrepl-ptcl-types:get-field message 'coverage)))
          (not (== coverage 'undefined))))
 
       ;; test_rerun_failures: requires results
       ((or (== op #"test_rerun_failures") (== op 'test_rerun_failures))
-       (let ((results (xrepl-protocol-types:get-field-any message '(results test_results))))
+       (let ((results (xrepl-ptcl-types:get-field-any message '(results test_results))))
          (not (== results 'undefined))))
 
       ;; generate_tests: requires generated
       ((or (== op #"generate_tests") (== op 'generate_tests))
-       (let ((generated (xrepl-protocol-types:get-field message 'generated)))
+       (let ((generated (xrepl-ptcl-types:get-field message 'generated)))
          (not (== generated 'undefined))))
 
       ;; Unknown operation
@@ -404,5 +404,5 @@
   Example:
     (error 'missing-namespace \"Namespace is required\")"
   (maps:put #"status" #"error"
-           (maps:put #"error-type" (xrepl-protocol-types:ensure-binary type)
-                    (maps:put #"error" (xrepl-protocol-types:ensure-binary msg) #m()))))
+           (maps:put #"error-type" (xrepl-ptcl-types:ensure-binary type)
+                    (maps:put #"error" (xrepl-ptcl-types:ensure-binary msg) #m()))))

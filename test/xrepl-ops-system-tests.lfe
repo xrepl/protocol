@@ -221,8 +221,8 @@
 
 (deftest ping-round-trip
   (let* ((req (xrepl-ops-system:ping-request))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"ping" (maps:get #"op" decoded))
     (is (xrepl-ops-system:valid-request? decoded))))
 
@@ -234,8 +234,8 @@
                         (maps:put 'ops ops
                                  (maps:put 'transports transports #m()))))
          (resp (xrepl-ops-system:describe-response opts))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal versions (maps:get #"versions" decoded))
     (is-equal ops (maps:get #"ops" decoded))
@@ -244,15 +244,15 @@
 (deftest version-round-trip
   (let* ((versions #m(#"xrepl" #"0.1.0" #"protocol" #"1.0"))
          (resp (xrepl-ops-system:version-response versions))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal versions (maps:get #"versions" decoded))))
 
 (deftest module-info-round-trip
   (let* ((req (xrepl-ops-system:module-info-request #m(module "lists" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"module_info" (maps:get #"op" decoded))
     (is-equal #"lists" (maps:get #"module" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))

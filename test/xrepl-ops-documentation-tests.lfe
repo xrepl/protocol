@@ -239,8 +239,8 @@
 
 (deftest doc-round-trip
   (let* ((req (xrepl-ops-documentation:doc-request #m(symbol "map:get" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"doc" (maps:get #"op" decoded))
     (is-equal #"map:get" (maps:get #"symbol" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
@@ -250,15 +250,15 @@
   (let* ((doc-map (maps:put #"doc" #"Get value from map"
                            (maps:put #"arglists" (list #"(map:get key map)") #m())))
          (resp (xrepl-ops-documentation:doc-response doc-map))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal doc-map (maps:get #"doc" decoded))))
 
 (deftest module-doc-round-trip
   (let* ((req (xrepl-ops-documentation:module-doc-request #m(module "lists" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"module_doc" (maps:get #"op" decoded))
     (is-equal #"lists" (maps:get #"module" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
@@ -268,15 +268,15 @@
   (let* ((doc-map (maps:put #"module" #"lists"
                            (maps:put #"doc" #"List processing functions" #m())))
          (resp (xrepl-ops-documentation:module-doc-response doc-map))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal doc-map (maps:get #"doc" decoded))))
 
 (deftest search-docs-round-trip
   (let* ((req (xrepl-ops-documentation:search-docs-request #m(query "map" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"search_docs" (maps:get #"op" decoded))
     (is-equal #"map" (maps:get #"query" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
@@ -285,16 +285,16 @@
 (deftest search-docs-response-round-trip
   (let* ((results (list #m(#"symbol" #"map:get" #"doc" #"Get value" #"relevance" 0.95)))
          (resp (xrepl-ops-documentation:search-docs-response results))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal results (maps:get #"results" decoded))))
 
 (deftest generate-doc-round-trip
   (let* ((req (xrepl-ops-documentation:generate-doc-request
               #m(target "src/foo.lfe" format "markdown" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"generate_doc" (maps:get #"op" decoded))
     (is-equal #"src/foo.lfe" (maps:get #"target" decoded))
     (is-equal #"markdown" (maps:get #"format" decoded))
@@ -306,15 +306,15 @@
                           (maps:put #"format" #"markdown"
                                    (maps:put #"path" #"docs/lists.md" #m()))))
          (resp (xrepl-ops-documentation:generate-doc-response result))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal result (maps:get #"result" decoded))))
 
 (deftest module-summary-round-trip
   (let* ((req (xrepl-ops-documentation:module-summary-request #m(module "lists" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"module_summary" (maps:get #"op" decoded))
     (is-equal #"lists" (maps:get #"module" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
@@ -325,7 +325,7 @@
                            (maps:put #"description" #"List functions"
                                     (maps:put #"exports" 42 #m()))))
          (resp (xrepl-ops-documentation:module-summary-response summary))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal summary (maps:get #"summary" decoded))))

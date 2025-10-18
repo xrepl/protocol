@@ -49,20 +49,20 @@
   Notes:
     - Supports both 'modules' and 'module' as field names (module will be converted to list)
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field-any opts '(modules module))
+  (case (xrepl-ptcl-types:get-field-any opts '(modules module))
     ('undefined (tuple 'error 'missing-modules))
     (modules-val
      (let* ((modules (if (is_list modules-val)
                         modules-val
                         (list modules-val)))
             (base (maps:put #"op" #"hot_reload"
-                           (xrepl-protocol-types:put-aliased-list
+                           (xrepl-ptcl-types:put-aliased-list
                             #m() 'modules 'module
-                            (lists:map #'xrepl-protocol-types:ensure-binary/1 modules))))
-            (with-purge (case (xrepl-protocol-types:get-field opts 'purge)
+                            (lists:map #'xrepl-ptcl-types:ensure-binary/1 modules))))
+            (with-purge (case (xrepl-ptcl-types:get-field opts 'purge)
                          ('undefined base)
                          (purge (maps:put #"purge" purge base))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-purge 'session 'session opts 'session)))
        with-session))))
 
@@ -81,9 +81,9 @@
     (hot-reload-response `#m(reloaded ,(list #\"mymodule\")))
     (hot-reload-response `#m(reloaded ,(list #\"foo\")
                              failed ,(list `#m(module #\"bar\" reason #\"not_found\"))))"
-  (let ((reloaded (xrepl-protocol-types:get-field opts 'reloaded '()))
-        (failed (xrepl-protocol-types:get-field opts 'failed '()))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((reloaded (xrepl-ptcl-types:get-field opts 'reloaded '()))
+        (failed (xrepl-ptcl-types:get-field opts 'failed '()))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status
              (maps:put #"reloaded" reloaded
                       (if (== failed '())
@@ -114,13 +114,13 @@
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
   (let* ((base (maps:put #"op" #"list_processes" #m()))
-         (with-filter (case (xrepl-protocol-types:get-field opts 'filter)
+         (with-filter (case (xrepl-ptcl-types:get-field opts 'filter)
                        ('undefined base)
                        (filter (maps:put #"filter" filter base))))
-         (with-details (case (xrepl-protocol-types:get-field opts 'details)
+         (with-details (case (xrepl-ptcl-types:get-field opts 'details)
                         ('undefined with-filter)
                         (details (maps:put #"details" details with-filter))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        with-details 'session 'session opts 'session)))
     with-session))
 
@@ -148,9 +148,9 @@
       `#m(processes ,(list `#m(pid #\"<0.42.0>\"
                                registered_name #\"my_server\"
                                status #\"waiting\"))))"
-  (let ((processes (xrepl-protocol-types:get-field opts 'processes '()))
-        (total (xrepl-protocol-types:get-field opts 'total 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((processes (xrepl-ptcl-types:get-field opts 'processes '()))
+        (total (xrepl-ptcl-types:get-field opts 'total 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let ((base (maps:put #"status" status
                          (maps:put #"processes" processes #m()))))
       (if (== total 'undefined)
@@ -181,19 +181,19 @@
   Notes:
     - Supports both 'pid' and 'process' as field names
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field-any opts '(pid process))
+  (case (xrepl-ptcl-types:get-field-any opts '(pid process))
     ('undefined (tuple 'error 'missing-pid))
     (pid
      (let* ((base (maps:put #"op" #"inspect_process"
-                           (xrepl-protocol-types:put-aliased
+                           (xrepl-ptcl-types:put-aliased
                             #m() 'pid 'process
-                            (xrepl-protocol-types:ensure-binary pid))))
-            (with-keys (case (xrepl-protocol-types:get-field opts 'info_keys)
+                            (xrepl-ptcl-types:ensure-binary pid))))
+            (with-keys (case (xrepl-ptcl-types:get-field opts 'info_keys)
                         ('undefined base)
                         (keys (maps:put #"info_keys"
-                                       (lists:map #'xrepl-protocol-types:ensure-binary/1 keys)
+                                       (lists:map #'xrepl-ptcl-types:ensure-binary/1 keys)
                                        base))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-keys 'session 'session opts 'session)))
        with-session))))
 
@@ -219,11 +219,11 @@
                   message_queue_len 0
                   heap_size 610
                   reductions 1234)))"
-  (let ((pid (xrepl-protocol-types:get-field opts 'pid #"unknown"))
-        (info (xrepl-protocol-types:get-field opts 'info #m()))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((pid (xrepl-ptcl-types:get-field opts 'pid #"unknown"))
+        (info (xrepl-ptcl-types:get-field opts 'info #m()))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status
-             (xrepl-protocol-types:put-aliased
+             (xrepl-ptcl-types:put-aliased
               (maps:put #"info" info #m())
               'pid 'process
               pid))))
@@ -258,31 +258,31 @@
     - Supports both 'module' and 'mod' as field names
     - Supports both 'function' and 'fun' as field names
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field opts 'action)
+  (case (xrepl-ptcl-types:get-field opts 'action)
     ('undefined (tuple 'error 'missing-action))
     (action
      (let* ((base (maps:put #"op" #"trace_calls"
-                           (maps:put #"action" (xrepl-protocol-types:ensure-binary action) #m())))
-            (with-module (case (xrepl-protocol-types:get-field-any opts '(module mod))
+                           (maps:put #"action" (xrepl-ptcl-types:ensure-binary action) #m())))
+            (with-module (case (xrepl-ptcl-types:get-field-any opts '(module mod))
                           ('undefined base)
-                          (mod (xrepl-protocol-types:put-aliased
+                          (mod (xrepl-ptcl-types:put-aliased
                                 base 'module 'mod
-                                (xrepl-protocol-types:ensure-binary mod)))))
-            (with-function (case (xrepl-protocol-types:get-field-any opts '(function fun))
+                                (xrepl-ptcl-types:ensure-binary mod)))))
+            (with-function (case (xrepl-ptcl-types:get-field-any opts '(function fun))
                             ('undefined with-module)
-                            (fun (xrepl-protocol-types:put-aliased
+                            (fun (xrepl-ptcl-types:put-aliased
                                   with-module 'function 'fun
-                                  (xrepl-protocol-types:ensure-binary fun)))))
-            (with-arity (case (xrepl-protocol-types:get-field opts 'arity)
+                                  (xrepl-ptcl-types:ensure-binary fun)))))
+            (with-arity (case (xrepl-ptcl-types:get-field opts 'arity)
                          ('undefined with-function)
                          (arity (maps:put #"arity" arity with-function))))
-            (with-pattern (case (xrepl-protocol-types:get-field opts 'pattern)
+            (with-pattern (case (xrepl-ptcl-types:get-field opts 'pattern)
                            ('undefined with-arity)
                            (pattern (maps:put #"pattern" pattern with-arity))))
-            (with-trace-opts (case (xrepl-protocol-types:get-field opts 'trace_opts)
+            (with-trace-opts (case (xrepl-ptcl-types:get-field opts 'trace_opts)
                               ('undefined with-pattern)
                               (trace-opts (maps:put #"trace_opts" trace-opts with-pattern))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-trace-opts 'session 'session opts 'session)))
        with-session))))
 
@@ -302,11 +302,11 @@
   Example:
     (trace-calls-response #m(trace_id #\"trace-123\" matched 5 traced 2))
     (trace-calls-response #m(action #\"stopped\"))"
-  (let ((trace-id (xrepl-protocol-types:get-field opts 'trace_id 'undefined))
-        (matched (xrepl-protocol-types:get-field opts 'matched 'undefined))
-        (traced (xrepl-protocol-types:get-field opts 'traced 'undefined))
-        (action (xrepl-protocol-types:get-field opts 'action 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((trace-id (xrepl-ptcl-types:get-field opts 'trace_id 'undefined))
+        (matched (xrepl-ptcl-types:get-field opts 'matched 'undefined))
+        (traced (xrepl-ptcl-types:get-field opts 'traced 'undefined))
+        (action (xrepl-ptcl-types:get-field opts 'action 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let* ((base (maps:put #"status" status #m()))
            (with-trace-id (if (== trace-id 'undefined) base (maps:put #"trace_id" trace-id base)))
            (with-matched (if (== matched 'undefined) with-trace-id (maps:put #"matched" matched with-trace-id)))
@@ -336,12 +336,12 @@
     - If no keys specified, returns common system info
     - Binary keys used throughout for MessagePack efficiency"
   (let* ((base (maps:put #"op" #"system_info" #m()))
-         (with-keys (case (xrepl-protocol-types:get-field opts 'keys)
+         (with-keys (case (xrepl-ptcl-types:get-field opts 'keys)
                      ('undefined base)
                      (keys (maps:put #"keys"
-                                    (lists:map #'xrepl-protocol-types:ensure-binary/1 keys)
+                                    (lists:map #'xrepl-ptcl-types:ensure-binary/1 keys)
                                     base))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        with-keys 'session 'session opts 'session)))
     with-session))
 
@@ -364,8 +364,8 @@
                    process_count 1234
                    otp_release #\"26\"
                    memory `#m(total 123456789 processes 45678 system 6789))))"
-  (let ((info (xrepl-protocol-types:get-field opts 'info #m()))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((info (xrepl-ptcl-types:get-field opts 'info #m()))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status
              (maps:put #"info" info #m()))))
 
@@ -394,17 +394,17 @@
   Notes:
     - Supports both 'data_type' and 'type' as field names
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field-any opts '(data_type type))
+  (case (xrepl-ptcl-types:get-field-any opts '(data_type type))
     ('undefined (tuple 'error 'missing-data-type))
     (data-type
      (let* ((base (maps:put #"op" #"observer_data"
-                           (xrepl-protocol-types:put-aliased
+                           (xrepl-ptcl-types:put-aliased
                             #m() 'data_type 'type
-                            (xrepl-protocol-types:ensure-binary data-type))))
-            (with-filter (case (xrepl-protocol-types:get-field opts 'filter)
+                            (xrepl-ptcl-types:ensure-binary data-type))))
+            (with-filter (case (xrepl-ptcl-types:get-field opts 'filter)
                           ('undefined base)
                           (filter (maps:put #"filter" filter base))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-filter 'session 'session opts 'session)))
        with-session))))
 
@@ -425,12 +425,12 @@
       `#m(data_type #\"processes\"
           data ,(list `#m(pid #\"<0.42.0>\" memory 1234 reductions 5678))
           timestamp 1234567890))"
-  (let ((data-type (xrepl-protocol-types:get-field opts 'data_type #"unknown"))
-        (data (xrepl-protocol-types:get-field opts 'data '()))
-        (timestamp (xrepl-protocol-types:get-field opts 'timestamp 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((data-type (xrepl-ptcl-types:get-field opts 'data_type #"unknown"))
+        (data (xrepl-ptcl-types:get-field opts 'data '()))
+        (timestamp (xrepl-ptcl-types:get-field opts 'timestamp 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let ((base (maps:put #"status" status
-                         (xrepl-protocol-types:put-aliased
+                         (xrepl-ptcl-types:put-aliased
                           (maps:put #"data" data #m())
                           'data_type 'type
                           data-type))))
@@ -448,119 +448,119 @@
 
   Returns:
     Tuple of (ok, parsed-request-map) or (error, reason)"
-  (let ((op (xrepl-protocol-types:get-field message 'op)))
+  (let ((op (xrepl-ptcl-types:get-field message 'op)))
     (cond
       ;; hot_reload
       ((or (== op #"hot_reload") (== op 'hot_reload))
-       (let ((modules (xrepl-protocol-types:get-field-any message '(modules module)))
-             (purge (xrepl-protocol-types:get-field message 'purge))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((modules (xrepl-ptcl-types:get-field-any message '(modules module)))
+             (purge (xrepl-ptcl-types:get-field message 'purge))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (== modules 'undefined)
            (tuple 'error 'missing-modules)
            (let* ((modules-list (if (is_list modules) modules (list modules)))
                   (base (maps:put #"op" #"hot_reload"
-                                 (xrepl-protocol-types:put-aliased-list
+                                 (xrepl-ptcl-types:put-aliased-list
                                   #m() 'modules 'module
-                                  (lists:map #'xrepl-protocol-types:ensure-binary/1 modules-list))))
+                                  (lists:map #'xrepl-ptcl-types:ensure-binary/1 modules-list))))
                   (with-purge (if (== purge 'undefined) base (maps:put #"purge" purge base)))
                   (with-session (if (== session 'undefined)
                                   with-purge
-                                  (maps:put #"session" (xrepl-protocol-types:ensure-binary session) with-purge))))
+                                  (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) with-purge))))
              (tuple 'ok with-session)))))
 
       ;; list_processes
       ((or (== op #"list_processes") (== op 'list_processes))
-       (let ((filter (xrepl-protocol-types:get-field message 'filter))
-             (details (xrepl-protocol-types:get-field message 'details))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((filter (xrepl-ptcl-types:get-field message 'filter))
+             (details (xrepl-ptcl-types:get-field message 'details))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (let* ((base (maps:put #"op" #"list_processes" #m()))
                 (with-filter (if (== filter 'undefined) base (maps:put #"filter" filter base)))
                 (with-details (if (== details 'undefined) with-filter (maps:put #"details" details with-filter)))
                 (with-session (if (== session 'undefined)
                                 with-details
-                                (maps:put #"session" (xrepl-protocol-types:ensure-binary session) with-details))))
+                                (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) with-details))))
            (tuple 'ok with-session))))
 
       ;; inspect_process
       ((or (== op #"inspect_process") (== op 'inspect_process))
-       (let ((pid (xrepl-protocol-types:get-field-any message '(pid process)))
-             (info-keys (xrepl-protocol-types:get-field message 'info_keys))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((pid (xrepl-ptcl-types:get-field-any message '(pid process)))
+             (info-keys (xrepl-ptcl-types:get-field message 'info_keys))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (== pid 'undefined)
            (tuple 'error 'missing-pid)
            (let* ((base (maps:put #"op" #"inspect_process"
-                                 (xrepl-protocol-types:put-aliased
+                                 (xrepl-ptcl-types:put-aliased
                                   #m() 'pid 'process
-                                  (xrepl-protocol-types:ensure-binary pid))))
+                                  (xrepl-ptcl-types:ensure-binary pid))))
                   (with-keys (if (== info-keys 'undefined)
                                base
                                (maps:put #"info_keys"
-                                        (lists:map #'xrepl-protocol-types:ensure-binary/1 info-keys)
+                                        (lists:map #'xrepl-ptcl-types:ensure-binary/1 info-keys)
                                         base)))
                   (with-session (if (== session 'undefined)
                                   with-keys
-                                  (maps:put #"session" (xrepl-protocol-types:ensure-binary session) with-keys))))
+                                  (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) with-keys))))
              (tuple 'ok with-session)))))
 
       ;; trace_calls
       ((or (== op #"trace_calls") (== op 'trace_calls))
-       (let ((action (xrepl-protocol-types:get-field message 'action))
-             (module (xrepl-protocol-types:get-field-any message '(module mod)))
-             (function (xrepl-protocol-types:get-field-any message '(function fun)))
-             (arity (xrepl-protocol-types:get-field message 'arity))
-             (pattern (xrepl-protocol-types:get-field message 'pattern))
-             (trace-opts (xrepl-protocol-types:get-field message 'trace_opts))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((action (xrepl-ptcl-types:get-field message 'action))
+             (module (xrepl-ptcl-types:get-field-any message '(module mod)))
+             (function (xrepl-ptcl-types:get-field-any message '(function fun)))
+             (arity (xrepl-ptcl-types:get-field message 'arity))
+             (pattern (xrepl-ptcl-types:get-field message 'pattern))
+             (trace-opts (xrepl-ptcl-types:get-field message 'trace_opts))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (== action 'undefined)
            (tuple 'error 'missing-action)
            (let* ((base (maps:put #"op" #"trace_calls"
-                                 (maps:put #"action" (xrepl-protocol-types:ensure-binary action) #m())))
+                                 (maps:put #"action" (xrepl-ptcl-types:ensure-binary action) #m())))
                   (with-module (if (== module 'undefined)
                                  base
-                                 (xrepl-protocol-types:put-aliased
+                                 (xrepl-ptcl-types:put-aliased
                                   base 'module 'mod
-                                  (xrepl-protocol-types:ensure-binary module))))
+                                  (xrepl-ptcl-types:ensure-binary module))))
                   (with-function (if (== function 'undefined)
                                    with-module
-                                   (xrepl-protocol-types:put-aliased
+                                   (xrepl-ptcl-types:put-aliased
                                     with-module 'function 'fun
-                                    (xrepl-protocol-types:ensure-binary function))))
+                                    (xrepl-ptcl-types:ensure-binary function))))
                   (with-arity (if (== arity 'undefined) with-function (maps:put #"arity" arity with-function)))
                   (with-pattern (if (== pattern 'undefined) with-arity (maps:put #"pattern" pattern with-arity)))
                   (with-trace-opts (if (== trace-opts 'undefined) with-pattern (maps:put #"trace_opts" trace-opts with-pattern)))
                   (with-session (if (== session 'undefined)
                                   with-trace-opts
-                                  (maps:put #"session" (xrepl-protocol-types:ensure-binary session) with-trace-opts))))
+                                  (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) with-trace-opts))))
              (tuple 'ok with-session)))))
 
       ;; system_info
       ((or (== op #"system_info") (== op 'system_info))
-       (let ((keys (xrepl-protocol-types:get-field message 'keys))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((keys (xrepl-ptcl-types:get-field message 'keys))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (let* ((base (maps:put #"op" #"system_info" #m()))
                 (with-keys (if (== keys 'undefined)
                              base
-                             (maps:put #"keys" (lists:map #'xrepl-protocol-types:ensure-binary/1 keys) base)))
+                             (maps:put #"keys" (lists:map #'xrepl-ptcl-types:ensure-binary/1 keys) base)))
                 (with-session (if (== session 'undefined)
                                 with-keys
-                                (maps:put #"session" (xrepl-protocol-types:ensure-binary session) with-keys))))
+                                (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) with-keys))))
            (tuple 'ok with-session))))
 
       ;; observer_data
       ((or (== op #"observer_data") (== op 'observer_data))
-       (let ((data-type (xrepl-protocol-types:get-field-any message '(data_type type)))
-             (filter (xrepl-protocol-types:get-field message 'filter))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((data-type (xrepl-ptcl-types:get-field-any message '(data_type type)))
+             (filter (xrepl-ptcl-types:get-field message 'filter))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (== data-type 'undefined)
            (tuple 'error 'missing-data-type)
            (let* ((base (maps:put #"op" #"observer_data"
-                                 (xrepl-protocol-types:put-aliased
+                                 (xrepl-ptcl-types:put-aliased
                                   #m() 'data_type 'type
-                                  (xrepl-protocol-types:ensure-binary data-type))))
+                                  (xrepl-ptcl-types:ensure-binary data-type))))
                   (with-filter (if (== filter 'undefined) base (maps:put #"filter" filter base)))
                   (with-session (if (== session 'undefined)
                                   with-filter
-                                  (maps:put #"session" (xrepl-protocol-types:ensure-binary session) with-filter))))
+                                  (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) with-filter))))
              (tuple 'ok with-session)))))
 
       ('true (tuple 'error 'unknown-operation)))))
@@ -577,9 +577,9 @@
   (cond
     ;; hot_reload
     ((or (== op #"hot_reload") (== op 'hot_reload))
-     (let ((status (xrepl-protocol-types:get-field message 'status #"done"))
-           (reloaded (xrepl-protocol-types:get-field message 'reloaded '()))
-           (failed (xrepl-protocol-types:get-field message 'failed '())))
+     (let ((status (xrepl-ptcl-types:get-field message 'status #"done"))
+           (reloaded (xrepl-ptcl-types:get-field message 'reloaded '()))
+           (failed (xrepl-ptcl-types:get-field message 'failed '())))
        (tuple 'ok (maps:put #"status" status
                            (maps:put #"reloaded" reloaded
                                     (if (== failed '())
@@ -588,31 +588,31 @@
 
     ;; list_processes
     ((or (== op #"list_processes") (== op 'list_processes))
-     (let ((status (xrepl-protocol-types:get-field message 'status #"done"))
-           (processes (xrepl-protocol-types:get-field message 'processes '()))
-           (total (xrepl-protocol-types:get-field message 'total)))
+     (let ((status (xrepl-ptcl-types:get-field message 'status #"done"))
+           (processes (xrepl-ptcl-types:get-field message 'processes '()))
+           (total (xrepl-ptcl-types:get-field message 'total)))
        (let ((base (maps:put #"status" status
                             (maps:put #"processes" processes #m()))))
          (tuple 'ok (if (== total 'undefined) base (maps:put #"total" total base))))))
 
     ;; inspect_process
     ((or (== op #"inspect_process") (== op 'inspect_process))
-     (let ((status (xrepl-protocol-types:get-field message 'status #"done"))
-           (pid (xrepl-protocol-types:get-field-any message '(pid process) #"unknown"))
-           (info (xrepl-protocol-types:get-field message 'info #m())))
+     (let ((status (xrepl-ptcl-types:get-field message 'status #"done"))
+           (pid (xrepl-ptcl-types:get-field-any message '(pid process) #"unknown"))
+           (info (xrepl-ptcl-types:get-field message 'info #m())))
        (tuple 'ok (maps:put #"status" status
-                           (xrepl-protocol-types:put-aliased
+                           (xrepl-ptcl-types:put-aliased
                             (maps:put #"info" info #m())
                             'pid 'process
                             pid)))))
 
     ;; trace_calls
     ((or (== op #"trace_calls") (== op 'trace_calls))
-     (let ((status (xrepl-protocol-types:get-field message 'status #"done"))
-           (trace-id (xrepl-protocol-types:get-field message 'trace_id))
-           (matched (xrepl-protocol-types:get-field message 'matched))
-           (traced (xrepl-protocol-types:get-field message 'traced))
-           (action (xrepl-protocol-types:get-field message 'action)))
+     (let ((status (xrepl-ptcl-types:get-field message 'status #"done"))
+           (trace-id (xrepl-ptcl-types:get-field message 'trace_id))
+           (matched (xrepl-ptcl-types:get-field message 'matched))
+           (traced (xrepl-ptcl-types:get-field message 'traced))
+           (action (xrepl-ptcl-types:get-field message 'action)))
        (let* ((base (maps:put #"status" status #m()))
               (with-trace-id (if (== trace-id 'undefined) base (maps:put #"trace_id" trace-id base)))
               (with-matched (if (== matched 'undefined) with-trace-id (maps:put #"matched" matched with-trace-id)))
@@ -622,19 +622,19 @@
 
     ;; system_info
     ((or (== op #"system_info") (== op 'system_info))
-     (let ((status (xrepl-protocol-types:get-field message 'status #"done"))
-           (info (xrepl-protocol-types:get-field message 'info #m())))
+     (let ((status (xrepl-ptcl-types:get-field message 'status #"done"))
+           (info (xrepl-ptcl-types:get-field message 'info #m())))
        (tuple 'ok (maps:put #"status" status
                            (maps:put #"info" info #m())))))
 
     ;; observer_data
     ((or (== op #"observer_data") (== op 'observer_data))
-     (let ((status (xrepl-protocol-types:get-field message 'status #"done"))
-           (data-type (xrepl-protocol-types:get-field-any message '(data_type type) #"unknown"))
-           (data (xrepl-protocol-types:get-field message 'data '()))
-           (timestamp (xrepl-protocol-types:get-field message 'timestamp)))
+     (let ((status (xrepl-ptcl-types:get-field message 'status #"done"))
+           (data-type (xrepl-ptcl-types:get-field-any message '(data_type type) #"unknown"))
+           (data (xrepl-ptcl-types:get-field message 'data '()))
+           (timestamp (xrepl-ptcl-types:get-field message 'timestamp)))
        (let ((base (maps:put #"status" status
-                            (xrepl-protocol-types:put-aliased
+                            (xrepl-ptcl-types:put-aliased
                              (maps:put #"data" data #m())
                              'data_type 'type
                              data-type))))
@@ -652,10 +652,10 @@
 
   Returns:
     true if valid, false otherwise"
-  (let ((op (xrepl-protocol-types:get-field message 'op)))
+  (let ((op (xrepl-ptcl-types:get-field message 'op)))
     (cond
       ((or (== op #"hot_reload") (== op 'hot_reload))
-       (let ((modules (xrepl-protocol-types:get-field-any message '(modules module))))
+       (let ((modules (xrepl-ptcl-types:get-field-any message '(modules module))))
          (andalso (/= modules 'undefined)
                   (or (is_list modules)
                       (is_binary modules)
@@ -665,12 +665,12 @@
        'true)  ; No required fields
 
       ((or (== op #"inspect_process") (== op 'inspect_process))
-       (let ((pid (xrepl-protocol-types:get-field-any message '(pid process))))
+       (let ((pid (xrepl-ptcl-types:get-field-any message '(pid process))))
          (andalso (/= pid 'undefined)
                   (or (is_binary pid) (is_atom pid)))))
 
       ((or (== op #"trace_calls") (== op 'trace_calls))
-       (let ((action (xrepl-protocol-types:get-field message 'action)))
+       (let ((action (xrepl-ptcl-types:get-field message 'action)))
          (andalso (/= action 'undefined)
                   (or (is_binary action) (is_atom action)))))
 
@@ -678,7 +678,7 @@
        'true)  ; No required fields
 
       ((or (== op #"observer_data") (== op 'observer_data))
-       (let ((data-type (xrepl-protocol-types:get-field-any message '(data_type type))))
+       (let ((data-type (xrepl-ptcl-types:get-field-any message '(data_type type))))
          (andalso (/= data-type 'undefined)
                   (or (is_binary data-type) (is_atom data-type)))))
 
@@ -693,20 +693,20 @@
 
   Returns:
     true if valid, false otherwise"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (cond
       ((or (== op #"hot_reload") (== op 'hot_reload))
-       (let ((reloaded (xrepl-protocol-types:get-field message 'reloaded)))
+       (let ((reloaded (xrepl-ptcl-types:get-field message 'reloaded)))
          (andalso (/= status 'undefined)
                   (or (is_list reloaded) (== reloaded 'undefined)))))
 
       ((or (== op #"list_processes") (== op 'list_processes))
-       (let ((processes (xrepl-protocol-types:get-field message 'processes)))
+       (let ((processes (xrepl-ptcl-types:get-field message 'processes)))
          (andalso (/= status 'undefined)
                   (or (is_list processes) (== processes 'undefined)))))
 
       ((or (== op #"inspect_process") (== op 'inspect_process))
-       (let ((info (xrepl-protocol-types:get-field message 'info)))
+       (let ((info (xrepl-ptcl-types:get-field message 'info)))
          (andalso (/= status 'undefined)
                   (or (is_map info) (== info 'undefined)))))
 
@@ -714,13 +714,13 @@
        (/= status 'undefined))
 
       ((or (== op #"system_info") (== op 'system_info))
-       (let ((info (xrepl-protocol-types:get-field message 'info)))
+       (let ((info (xrepl-ptcl-types:get-field message 'info)))
          (andalso (/= status 'undefined)
                   (or (is_map info) (== info 'undefined)))))
 
       ((or (== op #"observer_data") (== op 'observer_data))
-       (let ((data (xrepl-protocol-types:get-field message 'data))
-             (data-type (xrepl-protocol-types:get-field-any message '(data_type type))))
+       (let ((data (xrepl-ptcl-types:get-field message 'data))
+             (data-type (xrepl-ptcl-types:get-field-any message '(data_type type))))
          (andalso (/= status 'undefined)
                   (/= data-type 'undefined))))
 

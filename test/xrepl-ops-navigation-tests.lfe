@@ -247,8 +247,8 @@
 (deftest find-definition-round-trip
   (let* ((req (xrepl-ops-navigation:find-definition-request
               #m(symbol "map:get" file "test.lfe" line 10 column 5 session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"find_definition" (maps:get #"op" decoded))
     (is-equal #"map:get" (maps:get #"symbol" decoded))
     (is-equal #"test.lfe" (maps:get #"file" decoded))
@@ -260,8 +260,8 @@
 (deftest find-definition-response-round-trip
   (let* ((locs (list #m(#"file" #"src/foo.lfe" #"line" 42 #"column" 10)))
          (resp (xrepl-ops-navigation:find-definition-response locs))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal locs (maps:get #"locations" decoded))))
 
@@ -270,8 +270,8 @@
                         (maps:put 'include_declaration 'true
                                  (maps:put 'session #"s1" #m()))))
          (req (xrepl-ops-navigation:find-references-request opts))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"find_references" (maps:get #"op" decoded))
     (is-equal #"foo" (maps:get #"symbol" decoded))
     (is-equal 'true (maps:get #"include_declaration" decoded))
@@ -284,15 +284,15 @@
                         #"column" 8
                         #"context" #"usage")))
          (resp (xrepl-ops-navigation:find-references-response refs))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal refs (maps:get #"references" decoded))))
 
 (deftest list-definitions-round-trip
   (let* ((req (xrepl-ops-navigation:list-definitions-request #m(file "test.lfe" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"list_definitions" (maps:get #"op" decoded))
     (is-equal #"test.lfe" (maps:get #"file" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
@@ -301,16 +301,16 @@
 (deftest list-definitions-response-round-trip
   (let* ((defs (list #m(#"name" #"foo" #"type" #"function" #"line" 10 #"arity" 2)))
          (resp (xrepl-ops-navigation:list-definitions-response defs))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal defs (maps:get #"definitions" decoded))))
 
 (deftest symbol-at-point-round-trip
   (let* ((req (xrepl-ops-navigation:symbol-at-point-request
               #m(file "test.lfe" line 10 column 5 session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"symbol_at_point" (maps:get #"op" decoded))
     (is-equal #"test.lfe" (maps:get #"file" decoded))
     (is-equal 10 (maps:get #"line" decoded))
@@ -321,15 +321,15 @@
 (deftest symbol-at-point-response-round-trip
   (let* ((info #m(#"name" #"map:get" #"type" #"function" #"arity" 2))
          (resp (xrepl-ops-navigation:symbol-at-point-response info))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal info (maps:get #"symbol" decoded))))
 
 (deftest workspace-symbols-round-trip
   (let* ((req (xrepl-ops-navigation:workspace-symbols-request #m(query "map" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"workspace_symbols" (maps:get #"op" decoded))
     (is-equal #"map" (maps:get #"query" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
@@ -343,7 +343,7 @@
                                        (maps:put #"location" location-map #m()))))
          (symbols (list symbol-map))
          (resp (xrepl-ops-navigation:workspace-symbols-response symbols))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal symbols (maps:get #"symbols" decoded))))

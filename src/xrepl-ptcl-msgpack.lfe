@@ -1,4 +1,4 @@
-(defmodule xrepl-protocol-msgpack
+(defmodule xrepl-ptcl-msgpack
   "MessagePack encoding/decoding for xrepl protocol.
 
   Wraps msgpack-erlang library with xrepl-specific helpers."

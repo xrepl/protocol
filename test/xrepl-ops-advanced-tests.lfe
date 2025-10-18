@@ -571,47 +571,47 @@
 
 (deftest macroexpand-request-msgpack-roundtrip
   (let* ((req (xrepl-ops-advanced:macroexpand-request #m(form "(when true 1)")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"macroexpand" (maps:get #"op" decoded))
     (is-equal #"(when true 1)" (maps:get #"form" decoded))))
 
 (deftest history-request-msgpack-roundtrip
   (let* ((req (xrepl-ops-advanced:history-request #m(limit 10 reverse true)))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"history" (maps:get #"op" decoded))
     (is-equal 10 (maps:get #"limit" decoded))
     (is-equal 'true (maps:get #"reverse" decoded))))
 
 (deftest benchmark-request-msgpack-roundtrip
   (let* ((req (xrepl-ops-advanced:benchmark-request #m(code "(test)" iterations 1000)))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"benchmark" (maps:get #"op" decoded))
     (is-equal #"(test)" (maps:get #"code" decoded))
     (is-equal 1000 (maps:get #"iterations" decoded))))
 
 (deftest expand-snippet-request-msgpack-roundtrip
   (let* ((req (xrepl-ops-advanced:expand-snippet-request #m(id "for-loop")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"expand_snippet" (maps:get #"op" decoded))
     (is-equal #"for-loop" (maps:get #"id" decoded))
     (is-equal #"for-loop" (maps:get #"snippet_id" decoded))))
 
 (deftest macroexpand-response-msgpack-roundtrip
   (let* ((resp (xrepl-ops-advanced:macroexpand-response #m(expansion #"(expanded)")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal #"(expanded)" (maps:get #"expansion" decoded))))
 
 (deftest benchmark-response-msgpack-roundtrip
   (let* ((resp (xrepl-ops-advanced:benchmark-response
                  #m(mean_us 123.45 median_us 120.0 iterations 1000)))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal 123.45 (maps:get #"mean_us" decoded))
     (is-equal 120.0 (maps:get #"median_us" decoded))

@@ -1,4 +1,4 @@
-(defmodule xrepl-protocol-types
+(defmodule xrepl-ptcl-types
   "Core protocol type definitions and schemas."
   (export
    (message-envelope 0)

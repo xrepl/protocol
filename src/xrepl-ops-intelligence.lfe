@@ -59,24 +59,24 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'prefix)
+  (case (xrepl-ptcl-types:get-required opts 'prefix)
     (`#(ok ,prefix)
      (let* ((base (maps:put #"op" #"complete"
-                           (maps:put #"prefix" (xrepl-protocol-types:ensure-binary prefix)
+                           (maps:put #"prefix" (xrepl-ptcl-types:ensure-binary prefix)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session))
-            (with-cursor (case (xrepl-protocol-types:get-field opts 'cursor 'undefined)
+            (with-cursor (case (xrepl-ptcl-types:get-field opts 'cursor 'undefined)
                           ('undefined with-session)
                           (cursor (maps:put #"cursor" cursor with-session))))
-            (with-position (case (xrepl-protocol-types:get-field opts 'position 'undefined)
+            (with-position (case (xrepl-ptcl-types:get-field opts 'position 'undefined)
                             ('undefined with-cursor)
                             (pos (maps:put #"position" pos with-cursor))))
-            (with-code (case (xrepl-protocol-types:get-field opts 'code 'undefined)
+            (with-code (case (xrepl-ptcl-types:get-field opts 'code 'undefined)
                         ('undefined with-position)
-                        (code (maps:put #"code" (xrepl-protocol-types:ensure-binary code)
+                        (code (maps:put #"code" (xrepl-ptcl-types:ensure-binary code)
                                        with-position))))
-            (with-context (case (xrepl-protocol-types:get-field opts 'context 'undefined)
+            (with-context (case (xrepl-ptcl-types:get-field opts 'context 'undefined)
                            ('undefined with-code)
                            (ctx (maps:put #"context" ctx with-code)))))
        with-context))
@@ -103,11 +103,11 @@
     Response message map with BOTH 'candidates' and 'completions' fields"
   (let* ((base (maps:put #"status" #"done"
                         ;; Put candidates under BOTH field names
-                        (xrepl-protocol-types:put-aliased-list #m()
+                        (xrepl-ptcl-types:put-aliased-list #m()
                                                                'candidates
                                                                'completions
                                                                candidates)))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                         base 'session 'session opts 'session)))
     with-session))
 
@@ -125,20 +125,20 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'file)
+  (case (xrepl-ptcl-types:get-required opts 'file)
     (`#(ok ,file)
-     (case (xrepl-protocol-types:get-required opts 'line)
+     (case (xrepl-ptcl-types:get-required opts 'line)
        (`#(ok ,line)
-        (case (xrepl-protocol-types:get-required opts 'column)
+        (case (xrepl-ptcl-types:get-required opts 'column)
           (`#(ok ,column)
            (let* ((base (maps:put #"op" #"complete_context"
-                                 (maps:put #"file" (xrepl-protocol-types:ensure-binary file)
+                                 (maps:put #"file" (xrepl-ptcl-types:ensure-binary file)
                                           (maps:put #"line" line
                                                    (maps:put #"column" column #m())))))
-                  (with-code (case (xrepl-protocol-types:get-field opts 'code 'undefined)
+                  (with-code (case (xrepl-ptcl-types:get-field opts 'code 'undefined)
                               ('undefined base)
-                              (code (maps:put #"code" (xrepl-protocol-types:ensure-binary code) base))))
-                  (with-session (xrepl-protocol-types:maybe-put-aliased
+                              (code (maps:put #"code" (xrepl-ptcl-types:ensure-binary code) base))))
+                  (with-session (xrepl-ptcl-types:maybe-put-aliased
                                  with-code 'session 'session opts 'session)))
              with-session))
           (error error)))
@@ -155,7 +155,7 @@
   Returns:
     Response message map"
   (maps:put #"status" #"done"
-           (xrepl-protocol-types:put-aliased-list
+           (xrepl-ptcl-types:put-aliased-list
             (maps:put #"context" context-info #m())
             'candidates
             'completions
@@ -179,33 +179,33 @@
 
   Returns:
     Request message map"
-  (let* ((op-name (xrepl-protocol-types:get-field opts 'op_name 'signature))
-         (base (maps:put #"op" (xrepl-protocol-types:ensure-binary op-name) #m()))
-         (with-symbol (case (xrepl-protocol-types:get-field opts 'symbol 'undefined)
+  (let* ((op-name (xrepl-ptcl-types:get-field opts 'op_name 'signature))
+         (base (maps:put #"op" (xrepl-ptcl-types:ensure-binary op-name) #m()))
+         (with-symbol (case (xrepl-ptcl-types:get-field opts 'symbol 'undefined)
                        ('undefined base)
-                       (sym (maps:put #"symbol" (xrepl-protocol-types:ensure-binary sym) base))))
-         (with-file (case (xrepl-protocol-types:get-field opts 'file 'undefined)
+                       (sym (maps:put #"symbol" (xrepl-ptcl-types:ensure-binary sym) base))))
+         (with-file (case (xrepl-ptcl-types:get-field opts 'file 'undefined)
                      ('undefined with-symbol)
-                     (file (maps:put #"file" (xrepl-protocol-types:ensure-binary file)
+                     (file (maps:put #"file" (xrepl-ptcl-types:ensure-binary file)
                                     with-symbol))))
-         (with-line (case (xrepl-protocol-types:get-field opts 'line 'undefined)
+         (with-line (case (xrepl-ptcl-types:get-field opts 'line 'undefined)
                      ('undefined with-file)
                      (line (maps:put #"line" line with-file))))
-         (with-column (case (xrepl-protocol-types:get-field opts 'column 'undefined)
+         (with-column (case (xrepl-ptcl-types:get-field opts 'column 'undefined)
                        ('undefined with-line)
                        (col (maps:put #"column" col with-line))))
-         (with-code (case (xrepl-protocol-types:get-field opts 'code 'undefined)
+         (with-code (case (xrepl-ptcl-types:get-field opts 'code 'undefined)
                      ('undefined with-column)
-                     (code (maps:put #"code" (xrepl-protocol-types:ensure-binary code)
+                     (code (maps:put #"code" (xrepl-ptcl-types:ensure-binary code)
                                     with-column))))
-         (with-position (case (xrepl-protocol-types:get-field opts 'position 'undefined)
+         (with-position (case (xrepl-ptcl-types:get-field opts 'position 'undefined)
                          ('undefined with-code)
                          (pos (maps:put #"position" pos with-code))))
-         (with-contents (case (xrepl-protocol-types:get-field opts 'contents 'undefined)
+         (with-contents (case (xrepl-ptcl-types:get-field opts 'contents 'undefined)
                          ('undefined with-position)
-                         (cont (maps:put #"contents" (xrepl-protocol-types:ensure-binary cont)
+                         (cont (maps:put #"contents" (xrepl-ptcl-types:ensure-binary cont)
                                         with-position))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                         with-contents 'session 'session opts 'session)))
     with-session))
 
@@ -230,7 +230,7 @@
     Response message map"
   (let* ((base (maps:put #"status" #"done"
                         (maps:put #"signatures" signatures #m())))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                         base 'session 'session opts 'session)))
     with-session))
 
@@ -245,12 +245,12 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'symbol)
+  (case (xrepl-ptcl-types:get-required opts 'symbol)
     (`#(ok ,symbol)
      (let* ((base (maps:put #"op" #"eldoc"
-                           (maps:put #"symbol" (xrepl-protocol-types:ensure-binary symbol)
+                           (maps:put #"symbol" (xrepl-ptcl-types:ensure-binary symbol)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -276,7 +276,7 @@
     Response message map"
   (let* ((base (maps:put #"status" #"done"
                         (maps:put #"eldoc" info #m())))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                         base 'session 'session opts 'session)))
     with-session))
 
@@ -291,11 +291,11 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'symbols)
+  (case (xrepl-ptcl-types:get-required opts 'symbols)
     (`#(ok ,symbols)
      (let* ((base (maps:put #"op" #"eldoc_batch"
                            (maps:put #"symbols" symbols #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -322,12 +322,12 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'symbol)
+  (case (xrepl-ptcl-types:get-required opts 'symbol)
     (`#(ok ,symbol)
      (let* ((base (maps:put #"op" #"type_info"
-                           (maps:put #"symbol" (xrepl-protocol-types:ensure-binary symbol)
+                           (maps:put #"symbol" (xrepl-ptcl-types:ensure-binary symbol)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -356,15 +356,15 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'code)
+  (case (xrepl-ptcl-types:get-required opts 'code)
     (`#(ok ,code)
-     (let* ((op-name (xrepl-protocol-types:get-field opts 'op_name 'format))
-            (base (maps:put #"op" (xrepl-protocol-types:ensure-binary op-name)
-                           (maps:put #"code" (xrepl-protocol-types:ensure-binary code)
+     (let* ((op-name (xrepl-ptcl-types:get-field opts 'op_name 'format))
+            (base (maps:put #"op" (xrepl-ptcl-types:ensure-binary op-name)
+                           (maps:put #"code" (xrepl-ptcl-types:ensure-binary code)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session))
-            (with-options (case (xrepl-protocol-types:get-field opts 'options 'undefined)
+            (with-options (case (xrepl-ptcl-types:get-field opts 'options 'undefined)
                            ('undefined with-session)
                            (fmt-opts (maps:put #"options" fmt-opts with-session)))))
        with-options))
@@ -379,7 +379,7 @@
   Returns:
     Response message map"
   (maps:put #"status" #"done"
-           (maps:put #"formatted" (xrepl-protocol-types:ensure-binary formatted)
+           (maps:put #"formatted" (xrepl-ptcl-types:ensure-binary formatted)
                     #m())))
 
 ;;; apropos operation
@@ -393,12 +393,12 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'query)
+  (case (xrepl-ptcl-types:get-required opts 'query)
     (`#(ok ,query)
      (let* ((base (maps:put #"op" #"apropos"
-                           (maps:put #"query" (xrepl-protocol-types:ensure-binary query)
+                           (maps:put #"query" (xrepl-ptcl-types:ensure-binary query)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -425,11 +425,11 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'line)
+  (case (xrepl-ptcl-types:get-required opts 'line)
     (`#(ok ,line)
      (let* ((base (maps:put #"op" #"indent_info"
                            (maps:put #"line" line #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -457,15 +457,15 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'code)
+  (case (xrepl-ptcl-types:get-required opts 'code)
     (`#(ok ,code)
      (let* ((base (maps:put #"op" #"buffer_analysis"
-                           (maps:put #"code" (xrepl-protocol-types:ensure-binary code)
+                           (maps:put #"code" (xrepl-ptcl-types:ensure-binary code)
                                     #m())))
-            (with-file (case (xrepl-protocol-types:get-field opts 'file 'undefined)
+            (with-file (case (xrepl-ptcl-types:get-field opts 'file 'undefined)
                         ('undefined base)
-                        (file (maps:put #"file" (xrepl-protocol-types:ensure-binary file) base))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+                        (file (maps:put #"file" (xrepl-ptcl-types:ensure-binary file) base))))
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            with-file 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -492,12 +492,12 @@
 
   Returns:
     Request message map"
-  (case (xrepl-protocol-types:get-required opts 'code)
+  (case (xrepl-ptcl-types:get-required opts 'code)
     (`#(ok ,code)
      (let* ((base (maps:put #"op" #"highlight_regions"
-                           (maps:put #"code" (xrepl-protocol-types:ensure-binary code)
+                           (maps:put #"code" (xrepl-ptcl-types:ensure-binary code)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -524,10 +524,10 @@
   Returns:
     #(ok parsed-request) | #(error reason)"
   (try
-    (let ((op (xrepl-protocol-types:get-field message 'op)))
+    (let ((op (xrepl-ptcl-types:get-field message 'op)))
       (cond
         ((or (== op #"complete") (== op 'complete))
-         (let ((prefix (xrepl-protocol-types:get-field message 'prefix)))
+         (let ((prefix (xrepl-ptcl-types:get-field message 'prefix)))
            (if (== prefix 'undefined)
              (tuple 'error 'missing-prefix)
              (tuple 'ok (maps:put #"op" #"complete"
@@ -579,13 +579,13 @@
 
   Returns:
     #(ok result-map) | #(error error-info)"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (cond
       ((or (== status #"done") (== status 'done))
        (tuple 'ok message))  ;; Simple pass-through for now
 
       ((or (== status #"error") (== status 'error))
-       (tuple 'error (xrepl-protocol-types:get-field message 'error)))
+       (tuple 'error (xrepl-ptcl-types:get-field message 'error)))
 
       ('true (tuple 'error 'invalid-status)))))
 
@@ -610,7 +610,7 @@
 
   Returns:
     true | false"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (or (== status #"done")
         (== status 'done)
         (== status #"error")
@@ -627,4 +627,4 @@
 
   Returns:
     Error response map"
-  (xrepl-protocol-types:error-response error-type message))
+  (xrepl-ptcl-types:error-response error-type message))

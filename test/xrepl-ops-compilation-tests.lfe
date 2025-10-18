@@ -422,8 +422,8 @@
 (deftest roundtrip-compile-file-request
   (let* ((req (xrepl-ops-compilation:compile-file-request
                #m(file "src/foo.lfe")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"compile_file" (maps:get #"op" decoded))
     (is-equal #"src/foo.lfe" (maps:get #"file" decoded))
     (is-equal #"src/foo.lfe" (maps:get #"path" decoded))))
@@ -432,16 +432,16 @@
   (let* ((result (maps:put #"success" 'true
                           (maps:put #"warnings" (list) #m())))
          (resp (xrepl-ops-compilation:compile-file-response result))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal result (maps:get #"result" decoded))))
 
 (deftest roundtrip-compile-project-request
   (let* ((req (xrepl-ops-compilation:compile-project-request
                #m(path "/project" profile "prod")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"compile_project" (maps:get #"op" decoded))
     (is-equal #"/project" (maps:get #"path" decoded))
     (is-equal #"prod" (maps:get #"profile" decoded))
@@ -451,16 +451,16 @@
   (let* ((result (maps:put #"success" 'true
                           (maps:put #"files_compiled" 15 #m())))
          (resp (xrepl-ops-compilation:compile-project-response result))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal result (maps:get #"result" decoded))))
 
 (deftest roundtrip-lint-request
   (let* ((req (xrepl-ops-compilation:lint-request
                #m(file "foo.lfe")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"lint" (maps:get #"op" decoded))
     (is-equal #"foo.lfe" (maps:get #"file" decoded))
     (is-equal #"foo.lfe" (maps:get #"path" decoded))))
@@ -468,32 +468,32 @@
 (deftest roundtrip-lint-response
   (let* ((issues (list (maps:put #"severity" #"warning" #m())))
          (resp (xrepl-ops-compilation:lint-response issues))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal issues (maps:get #"issues" decoded))))
 
 (deftest roundtrip-dependencies-request
   (let* ((req (xrepl-ops-compilation:dependencies-request
                #m(type "direct")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"dependencies" (maps:get #"op" decoded))
     (is-equal #"direct" (maps:get #"type" decoded))))
 
 (deftest roundtrip-dependencies-response
   (let* ((deps (list (maps:put #"name" #"lfe" #m())))
          (resp (xrepl-ops-compilation:dependencies-response deps))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal deps (maps:get #"dependencies" decoded))))
 
 (deftest roundtrip-build-request
   (let* ((req (xrepl-ops-compilation:build-request
                #m(task "compile")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"build" (maps:get #"op" decoded))
     (is-equal #"compile" (maps:get #"task" decoded))
     (is-equal #"compile" (maps:get #"target" decoded))))
@@ -502,8 +502,8 @@
   (let* ((result (maps:put #"success" 'true
                           (maps:put #"duration" 5.2 #m())))
          (resp (xrepl-ops-compilation:build-response result))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal result (maps:get #"result" decoded))))
 

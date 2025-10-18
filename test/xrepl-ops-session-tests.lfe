@@ -214,8 +214,8 @@
 
 (deftest clone-request-round-trip
   (let* ((req (xrepl-ops-session:clone-request))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"clone" (maps:get #"op" decoded))
     (is (xrepl-ops-session:valid-request? decoded))))
 
@@ -223,8 +223,8 @@
   (let* ((cmds (list "cmd1" "cmd2"))
          (opts (maps:put 'commands cmds (maps:put 'session "test" #m())))
          (req (xrepl-ops-session:upload-history-request opts))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     ;; Both field aliases should survive encoding
     (is-equal cmds (maps:get #"commands" decoded))
     (is-equal cmds (maps:get #"history" decoded))
@@ -232,8 +232,8 @@
 
 (deftest switch-namespace-round-trip
   (let* ((req (xrepl-ops-session:switch-namespace-request #m(namespace "my-mod" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"switch_namespace" (maps:get #"op" decoded))
     (is-equal #"my-mod" (maps:get #"namespace" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))

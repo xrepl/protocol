@@ -41,36 +41,36 @@
     (rename-symbol-request #m(symbol \"foo\" new_name \"bar\"))
     (rename-symbol-request #m(old_name \"foo\" new_name \"bar\" file \"src/test.lfe\"))
     (rename-symbol-request #m(symbol \"baz\" new_name \"qux\" scope \"project\"))"
-  (case (xrepl-protocol-types:get-required opts 'new_name)
+  (case (xrepl-ptcl-types:get-required opts 'new_name)
     (`#(ok ,new-name)
-     (case (xrepl-protocol-types:get-field-any opts '(symbol old_name))
+     (case (xrepl-ptcl-types:get-field-any opts '(symbol old_name))
        ('undefined
         (tuple 'error 'missing-symbol))
        (symbol
         (let* ((base (maps:put #"op" #"rename_symbol"
-                              (xrepl-protocol-types:put-aliased
+                              (xrepl-ptcl-types:put-aliased
                                #m() 'symbol 'old_name
-                               (xrepl-protocol-types:ensure-binary symbol))))
+                               (xrepl-ptcl-types:ensure-binary symbol))))
                (with-new-name (maps:put #"new_name"
-                                       (xrepl-protocol-types:ensure-binary new-name)
+                                       (xrepl-ptcl-types:ensure-binary new-name)
                                        base))
-               (with-file (case (xrepl-protocol-types:get-field opts 'file 'undefined)
+               (with-file (case (xrepl-ptcl-types:get-field opts 'file 'undefined)
                            ('undefined with-new-name)
                            (f (maps:put #"file"
-                                       (xrepl-protocol-types:ensure-binary f)
+                                       (xrepl-ptcl-types:ensure-binary f)
                                        with-new-name))))
-               (with-line (case (xrepl-protocol-types:get-field opts 'line 'undefined)
+               (with-line (case (xrepl-ptcl-types:get-field opts 'line 'undefined)
                            ('undefined with-file)
                            (l (maps:put #"line" l with-file))))
-               (with-column (case (xrepl-protocol-types:get-field opts 'column 'undefined)
+               (with-column (case (xrepl-ptcl-types:get-field opts 'column 'undefined)
                              ('undefined with-line)
                              (c (maps:put #"column" c with-line))))
-               (with-scope (case (xrepl-protocol-types:get-field opts 'scope 'undefined)
+               (with-scope (case (xrepl-ptcl-types:get-field opts 'scope 'undefined)
                             ('undefined with-column)
                             (s (maps:put #"scope"
-                                        (xrepl-protocol-types:ensure-binary s)
+                                        (xrepl-ptcl-types:ensure-binary s)
                                         with-column))))
-               (with-session (xrepl-protocol-types:maybe-put-aliased
+               (with-session (xrepl-ptcl-types:maybe-put-aliased
                              with-scope 'session 'session opts 'session)))
           with-session))))
     (error error)))
@@ -114,41 +114,41 @@
     (extract-function-request #m(code \"(+ x y)\" function_name \"add-nums\"))
     (extract-function-request #m(selection \"foo\" name \"bar\" file \"test.lfe\"))
     (extract-function-request #m(code \"code\" function_name \"fn\" line 10 column 5))"
-  (case (xrepl-protocol-types:get-field-any opts '(function_name name))
+  (case (xrepl-ptcl-types:get-field-any opts '(function_name name))
     ('undefined
      (tuple 'error 'missing-function-name))
     (fn-name
-     (case (xrepl-protocol-types:get-field-any opts '(code selection))
+     (case (xrepl-ptcl-types:get-field-any opts '(code selection))
        ('undefined
         (tuple 'error 'missing-code))
        (code
         (let* ((base (maps:put #"op" #"extract_function"
-                              (xrepl-protocol-types:put-aliased
+                              (xrepl-ptcl-types:put-aliased
                                #m() 'code 'selection
-                               (xrepl-protocol-types:ensure-binary code))))
-               (with-name (xrepl-protocol-types:put-aliased
+                               (xrepl-ptcl-types:ensure-binary code))))
+               (with-name (xrepl-ptcl-types:put-aliased
                           base 'function_name 'name
-                          (xrepl-protocol-types:ensure-binary fn-name)))
-               (with-file (case (xrepl-protocol-types:get-field opts 'file 'undefined)
+                          (xrepl-ptcl-types:ensure-binary fn-name)))
+               (with-file (case (xrepl-ptcl-types:get-field opts 'file 'undefined)
                            ('undefined with-name)
                            (f (maps:put #"file"
-                                       (xrepl-protocol-types:ensure-binary f)
+                                       (xrepl-ptcl-types:ensure-binary f)
                                        with-name))))
-               (with-start-line (case (xrepl-protocol-types:get-field-any opts '(start_line line))
+               (with-start-line (case (xrepl-ptcl-types:get-field-any opts '(start_line line))
                                  ('undefined with-file)
-                                 (sl (xrepl-protocol-types:put-aliased
+                                 (sl (xrepl-ptcl-types:put-aliased
                                      with-file 'start_line 'line sl))))
-               (with-start-col (case (xrepl-protocol-types:get-field-any opts '(start_column column))
+               (with-start-col (case (xrepl-ptcl-types:get-field-any opts '(start_column column))
                                 ('undefined with-start-line)
-                                (sc (xrepl-protocol-types:put-aliased
+                                (sc (xrepl-ptcl-types:put-aliased
                                     with-start-line 'start_column 'column sc))))
-               (with-end-line (case (xrepl-protocol-types:get-field opts 'end_line 'undefined)
+               (with-end-line (case (xrepl-ptcl-types:get-field opts 'end_line 'undefined)
                                ('undefined with-start-col)
                                (el (maps:put #"end_line" el with-start-col))))
-               (with-end-col (case (xrepl-protocol-types:get-field opts 'end_column 'undefined)
+               (with-end-col (case (xrepl-ptcl-types:get-field opts 'end_column 'undefined)
                               ('undefined with-end-line)
                               (ec (maps:put #"end_column" ec with-end-line))))
-               (with-session (xrepl-protocol-types:maybe-put-aliased
+               (with-session (xrepl-ptcl-types:maybe-put-aliased
                              with-end-col 'session 'session opts 'session)))
           with-session))))))
 
@@ -188,29 +188,29 @@
     (inline-function-request #m(function \"add-nums\"))
     (inline-function-request #m(symbol \"foo\" file \"test.lfe\" line 10))
     (inline-function-request #m(function \"bar\" all_calls true))"
-  (case (xrepl-protocol-types:get-field-any opts '(function symbol))
+  (case (xrepl-ptcl-types:get-field-any opts '(function symbol))
     ('undefined
      (tuple 'error 'missing-function))
     (fn
      (let* ((base (maps:put #"op" #"inline_function"
-                           (xrepl-protocol-types:put-aliased
+                           (xrepl-ptcl-types:put-aliased
                             #m() 'function 'symbol
-                            (xrepl-protocol-types:ensure-binary fn))))
-            (with-file (case (xrepl-protocol-types:get-field opts 'file 'undefined)
+                            (xrepl-ptcl-types:ensure-binary fn))))
+            (with-file (case (xrepl-ptcl-types:get-field opts 'file 'undefined)
                         ('undefined base)
                         (f (maps:put #"file"
-                                    (xrepl-protocol-types:ensure-binary f)
+                                    (xrepl-ptcl-types:ensure-binary f)
                                     base))))
-            (with-line (case (xrepl-protocol-types:get-field opts 'line 'undefined)
+            (with-line (case (xrepl-ptcl-types:get-field opts 'line 'undefined)
                         ('undefined with-file)
                         (l (maps:put #"line" l with-file))))
-            (with-column (case (xrepl-protocol-types:get-field opts 'column 'undefined)
+            (with-column (case (xrepl-ptcl-types:get-field opts 'column 'undefined)
                           ('undefined with-line)
                           (c (maps:put #"column" c with-line))))
-            (with-all-calls (case (xrepl-protocol-types:get-field opts 'all_calls 'undefined)
+            (with-all-calls (case (xrepl-ptcl-types:get-field opts 'all_calls 'undefined)
                              ('undefined with-column)
                              (ac (maps:put #"all_calls" ac with-column))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-all-calls 'session 'session opts 'session)))
        with-session))))
 
@@ -241,17 +241,17 @@
 
   Returns:
     #(ok parsed-message) or #(error reason)"
-  (let ((op (xrepl-protocol-types:get-field message 'op)))
+  (let ((op (xrepl-ptcl-types:get-field message 'op)))
     (cond
       ;; rename_symbol
       ((or (== op #"rename_symbol") (== op 'rename_symbol))
-       (let ((symbol (xrepl-protocol-types:get-field-any message '(symbol old_name)))
-             (new-name (xrepl-protocol-types:get-field message 'new_name))
-             (file (xrepl-protocol-types:get-field message 'file))
-             (line (xrepl-protocol-types:get-field message 'line))
-             (column (xrepl-protocol-types:get-field message 'column))
-             (scope (xrepl-protocol-types:get-field message 'scope))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((symbol (xrepl-ptcl-types:get-field-any message '(symbol old_name)))
+             (new-name (xrepl-ptcl-types:get-field message 'new_name))
+             (file (xrepl-ptcl-types:get-field message 'file))
+             (line (xrepl-ptcl-types:get-field message 'line))
+             (column (xrepl-ptcl-types:get-field message 'column))
+             (scope (xrepl-ptcl-types:get-field message 'scope))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (or (== symbol 'undefined) (== new-name 'undefined))
            (tuple 'error 'missing-required-field)
            (tuple 'ok (maps:put #"op" #"rename_symbol"
@@ -265,14 +265,14 @@
 
       ;; extract_function
       ((or (== op #"extract_function") (== op 'extract_function))
-       (let ((code (xrepl-protocol-types:get-field-any message '(code selection)))
-             (fn-name (xrepl-protocol-types:get-field-any message '(function_name name)))
-             (file (xrepl-protocol-types:get-field message 'file))
-             (start-line (xrepl-protocol-types:get-field-any message '(start_line line)))
-             (start-col (xrepl-protocol-types:get-field-any message '(start_column column)))
-             (end-line (xrepl-protocol-types:get-field message 'end_line))
-             (end-col (xrepl-protocol-types:get-field message 'end_column))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((code (xrepl-ptcl-types:get-field-any message '(code selection)))
+             (fn-name (xrepl-ptcl-types:get-field-any message '(function_name name)))
+             (file (xrepl-ptcl-types:get-field message 'file))
+             (start-line (xrepl-ptcl-types:get-field-any message '(start_line line)))
+             (start-col (xrepl-ptcl-types:get-field-any message '(start_column column)))
+             (end-line (xrepl-ptcl-types:get-field message 'end_line))
+             (end-col (xrepl-ptcl-types:get-field message 'end_column))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (or (== code 'undefined) (== fn-name 'undefined))
            (tuple 'error 'missing-required-field)
            (tuple 'ok (maps:put #"op" #"extract_function"
@@ -287,12 +287,12 @@
 
       ;; inline_function
       ((or (== op #"inline_function") (== op 'inline_function))
-       (let ((fn (xrepl-protocol-types:get-field-any message '(function symbol)))
-             (file (xrepl-protocol-types:get-field message 'file))
-             (line (xrepl-protocol-types:get-field message 'line))
-             (column (xrepl-protocol-types:get-field message 'column))
-             (all-calls (xrepl-protocol-types:get-field message 'all_calls))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((fn (xrepl-ptcl-types:get-field-any message '(function symbol)))
+             (file (xrepl-ptcl-types:get-field message 'file))
+             (line (xrepl-ptcl-types:get-field message 'line))
+             (column (xrepl-ptcl-types:get-field message 'column))
+             (all-calls (xrepl-ptcl-types:get-field message 'all_calls))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (== fn 'undefined)
            (tuple 'error 'missing-function)
            (tuple 'ok (maps:put #"op" #"inline_function"
@@ -316,23 +316,23 @@
 
   Returns:
     #(ok parsed-response) or #(error reason)"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (cond
       ;; rename_symbol response
       ((or (== op #"rename_symbol") (== op 'rename_symbol))
-       (let ((changes (xrepl-protocol-types:get-field message 'changes)))
+       (let ((changes (xrepl-ptcl-types:get-field message 'changes)))
          (tuple 'ok (maps:put #"status" status
                              (maps:put #"changes" changes #m())))))
 
       ;; extract_function response
       ((or (== op #"extract_function") (== op 'extract_function))
-       (let ((result (xrepl-protocol-types:get-field message 'result)))
+       (let ((result (xrepl-ptcl-types:get-field message 'result)))
          (tuple 'ok (maps:put #"status" status
                              (maps:put #"result" result #m())))))
 
       ;; inline_function response
       ((or (== op #"inline_function") (== op 'inline_function))
-       (let ((result (xrepl-protocol-types:get-field message 'result)))
+       (let ((result (xrepl-ptcl-types:get-field message 'result)))
          (tuple 'ok (maps:put #"status" status
                              (maps:put #"result" result #m())))))
 
@@ -350,25 +350,25 @@
 
   Returns:
     true if valid, false otherwise"
-  (let ((op (xrepl-protocol-types:get-field message 'op)))
+  (let ((op (xrepl-ptcl-types:get-field message 'op)))
     (cond
       ;; rename_symbol: requires symbol and new_name
       ((or (== op #"rename_symbol") (== op 'rename_symbol))
-       (let ((symbol (xrepl-protocol-types:get-field-any message '(symbol old_name)))
-             (new-name (xrepl-protocol-types:get-field message 'new_name)))
+       (let ((symbol (xrepl-ptcl-types:get-field-any message '(symbol old_name)))
+             (new-name (xrepl-ptcl-types:get-field message 'new_name)))
          (and (not (== symbol 'undefined))
               (not (== new-name 'undefined)))))
 
       ;; extract_function: requires code and function_name
       ((or (== op #"extract_function") (== op 'extract_function))
-       (let ((code (xrepl-protocol-types:get-field-any message '(code selection)))
-             (fn-name (xrepl-protocol-types:get-field-any message '(function_name name))))
+       (let ((code (xrepl-ptcl-types:get-field-any message '(code selection)))
+             (fn-name (xrepl-ptcl-types:get-field-any message '(function_name name))))
          (and (not (== code 'undefined))
               (not (== fn-name 'undefined)))))
 
       ;; inline_function: requires function
       ((or (== op #"inline_function") (== op 'inline_function))
-       (let ((fn (xrepl-protocol-types:get-field-any message '(function symbol))))
+       (let ((fn (xrepl-ptcl-types:get-field-any message '(function symbol))))
          (not (== fn 'undefined))))
 
       ;; Unknown or missing op
@@ -383,24 +383,24 @@
 
   Returns:
     true if valid, false otherwise"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (cond
       ;; All responses require status
       ((== status 'undefined) 'false)
 
       ;; rename_symbol: requires changes
       ((or (== op #"rename_symbol") (== op 'rename_symbol))
-       (let ((changes (xrepl-protocol-types:get-field message 'changes)))
+       (let ((changes (xrepl-ptcl-types:get-field message 'changes)))
          (not (== changes 'undefined))))
 
       ;; extract_function: requires result
       ((or (== op #"extract_function") (== op 'extract_function))
-       (let ((result (xrepl-protocol-types:get-field message 'result)))
+       (let ((result (xrepl-ptcl-types:get-field message 'result)))
          (not (== result 'undefined))))
 
       ;; inline_function: requires result
       ((or (== op #"inline_function") (== op 'inline_function))
-       (let ((result (xrepl-protocol-types:get-field message 'result)))
+       (let ((result (xrepl-ptcl-types:get-field message 'result)))
          (not (== result 'undefined))))
 
       ;; Unknown operation
@@ -421,5 +421,5 @@
   Example:
     (error 'missing-function \"Function name is required\")"
   (maps:put #"status" #"error"
-           (maps:put #"error-type" (xrepl-protocol-types:ensure-binary type)
-                    (maps:put #"error" (xrepl-protocol-types:ensure-binary msg) #m()))))
+           (maps:put #"error-type" (xrepl-ptcl-types:ensure-binary type)
+                    (maps:put #"error" (xrepl-ptcl-types:ensure-binary msg) #m()))))

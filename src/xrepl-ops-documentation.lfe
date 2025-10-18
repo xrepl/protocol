@@ -41,12 +41,12 @@
   Example:
     (doc-request #m(symbol \"map:get\"))
     (doc-request #m(symbol \"lists:map\" session \"s1\"))"
-  (case (xrepl-protocol-types:get-required opts 'symbol)
+  (case (xrepl-ptcl-types:get-required opts 'symbol)
     (`#(ok ,symbol)
      (let* ((base (maps:put #"op" #"doc"
-                           (maps:put #"symbol" (xrepl-protocol-types:ensure-binary symbol)
+                           (maps:put #"symbol" (xrepl-ptcl-types:ensure-binary symbol)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -81,12 +81,12 @@
   Example:
     (module-doc-request #m(module \"lists\"))
     (module-doc-request #m(module \"maps\" session \"s1\"))"
-  (case (xrepl-protocol-types:get-required opts 'module)
+  (case (xrepl-ptcl-types:get-required opts 'module)
     (`#(ok ,module)
      (let* ((base (maps:put #"op" #"module_doc"
-                           (maps:put #"module" (xrepl-protocol-types:ensure-binary module)
+                           (maps:put #"module" (xrepl-ptcl-types:ensure-binary module)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -122,12 +122,12 @@
   Example:
     (search-docs-request #m(query \"map\"))
     (search-docs-request #m(query \"list filter\" session \"s1\"))"
-  (case (xrepl-protocol-types:get-required opts 'query)
+  (case (xrepl-ptcl-types:get-required opts 'query)
     (`#(ok ,query)
      (let* ((base (maps:put #"op" #"search_docs"
-                           (maps:put #"query" (xrepl-protocol-types:ensure-binary query)
+                           (maps:put #"query" (xrepl-ptcl-types:ensure-binary query)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -165,15 +165,15 @@
   Example:
     (generate-doc-request #m(target \"src/foo.lfe\"))
     (generate-doc-request #m(target \"lists:map\" format \"markdown\"))"
-  (case (xrepl-protocol-types:get-required opts 'target)
+  (case (xrepl-ptcl-types:get-required opts 'target)
     (`#(ok ,target)
      (let* ((base (maps:put #"op" #"generate_doc"
-                           (maps:put #"target" (xrepl-protocol-types:ensure-binary target)
+                           (maps:put #"target" (xrepl-ptcl-types:ensure-binary target)
                                     #m())))
-            (with-format (case (xrepl-protocol-types:get-field opts 'format 'undefined)
+            (with-format (case (xrepl-ptcl-types:get-field opts 'format 'undefined)
                           ('undefined base)
-                          (fmt (maps:put #"format" (xrepl-protocol-types:ensure-binary fmt) base))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+                          (fmt (maps:put #"format" (xrepl-ptcl-types:ensure-binary fmt) base))))
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            with-format 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -209,12 +209,12 @@
   Example:
     (module-summary-request #m(module \"lists\"))
     (module-summary-request #m(module \"maps\" session \"s1\"))"
-  (case (xrepl-protocol-types:get-required opts 'module)
+  (case (xrepl-ptcl-types:get-required opts 'module)
     (`#(ok ,module)
      (let* ((base (maps:put #"op" #"module_summary"
-                           (maps:put #"module" (xrepl-protocol-types:ensure-binary module)
+                           (maps:put #"module" (xrepl-ptcl-types:ensure-binary module)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -248,11 +248,11 @@
   Returns:
     #(ok parsed-request) | #(error reason)"
   (try
-    (let ((op (xrepl-protocol-types:get-field message 'op)))
+    (let ((op (xrepl-ptcl-types:get-field message 'op)))
       (cond
         ;; doc operation
         ((or (== op #"doc") (== op 'doc))
-         (let ((symbol (xrepl-protocol-types:get-field message 'symbol)))
+         (let ((symbol (xrepl-ptcl-types:get-field message 'symbol)))
            (if (== symbol 'undefined)
              (tuple 'error 'missing-symbol)
              (tuple 'ok (maps:put #"op" #"doc"
@@ -260,7 +260,7 @@
 
         ;; module_doc operation
         ((or (== op #"module_doc") (== op 'module_doc))
-         (let ((module (xrepl-protocol-types:get-field message 'module)))
+         (let ((module (xrepl-ptcl-types:get-field message 'module)))
            (if (== module 'undefined)
              (tuple 'error 'missing-module)
              (tuple 'ok (maps:put #"op" #"module_doc"
@@ -268,7 +268,7 @@
 
         ;; search_docs operation
         ((or (== op #"search_docs") (== op 'search_docs))
-         (let ((query (xrepl-protocol-types:get-field message 'query)))
+         (let ((query (xrepl-ptcl-types:get-field message 'query)))
            (if (== query 'undefined)
              (tuple 'error 'missing-query)
              (tuple 'ok (maps:put #"op" #"search_docs"
@@ -276,7 +276,7 @@
 
         ;; generate_doc operation
         ((or (== op #"generate_doc") (== op 'generate_doc))
-         (let ((target (xrepl-protocol-types:get-field message 'target)))
+         (let ((target (xrepl-ptcl-types:get-field message 'target)))
            (if (== target 'undefined)
              (tuple 'error 'missing-target)
              (tuple 'ok (maps:put #"op" #"generate_doc"
@@ -284,7 +284,7 @@
 
         ;; module_summary operation
         ((or (== op #"module_summary") (== op 'module_summary))
-         (let ((module (xrepl-protocol-types:get-field message 'module)))
+         (let ((module (xrepl-ptcl-types:get-field message 'module)))
            (if (== module 'undefined)
              (tuple 'error 'missing-module)
              (tuple 'ok (maps:put #"op" #"module_summary"
@@ -304,13 +304,13 @@
 
   Returns:
     #(ok result-map) | #(error error-info)"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (cond
       ((or (== status #"done") (== status 'done))
        (tuple 'ok message))  ;; Simple pass-through for now
 
       ((or (== status #"error") (== status 'error))
-       (tuple 'error (xrepl-protocol-types:get-field message 'error)))
+       (tuple 'error (xrepl-ptcl-types:get-field message 'error)))
 
       ('true (tuple 'error 'invalid-status)))))
 
@@ -335,7 +335,7 @@
 
   Returns:
     true | false"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (or (== status #"done")
         (== status 'done)
         (== status #"error")
@@ -352,4 +352,4 @@
 
   Returns:
     Error response map"
-  (xrepl-protocol-types:error-response error-type message))
+  (xrepl-ptcl-types:error-response error-type message))

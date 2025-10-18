@@ -218,8 +218,8 @@
 
 (deftest eval-request-round-trip
   (let* ((req (xrepl-ops-evaluation:eval-request #m(code "(+ 1 2)" session "test")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"eval" (maps:get #"op" decoded))
     (is-equal #"(+ 1 2)" (maps:get #"code" decoded))
     (is-equal #"test" (maps:get #"session" decoded))
@@ -227,15 +227,15 @@
 
 (deftest load-file-request-round-trip
   (let* ((req (xrepl-ops-evaluation:load-file-request #m(file "test.lfe")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"load_file" (maps:get #"op" decoded))
     (is (xrepl-ops-evaluation:valid-request? decoded))))
 
 (deftest eval-response-round-trip-with-aliases
   (let* ((resp (xrepl-ops-evaluation:eval-response "42" #m(session "test" ns "user")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     ;; Both aliases should be present
     (is-equal #"user" (maps:get #"ns" decoded))
     (is-equal #"user" (maps:get #"namespace" decoded))

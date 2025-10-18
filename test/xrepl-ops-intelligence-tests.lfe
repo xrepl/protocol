@@ -368,8 +368,8 @@
 
 (deftest complete-round-trip
   (let* ((req (xrepl-ops-intelligence:complete-request #m(prefix "map:" cursor 4)))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"complete" (maps:get #"op" decoded))
     (is-equal #"map:" (maps:get #"prefix" decoded))
     (is-equal 4 (maps:get #"cursor" decoded))
@@ -378,8 +378,8 @@
 (deftest complete-response-round-trip
   (let* ((candidates (list #m(#"text" #"map:get" #"type" #"function")))
          (resp (xrepl-ops-intelligence:complete-response candidates #m(session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     ;; Both field names should survive round-trip
     (is-equal candidates (maps:get #"candidates" decoded))
@@ -389,8 +389,8 @@
 (deftest signature-request-round-trip
   (let* ((req (xrepl-ops-intelligence:signature-request
               #m(symbol "map:get" op_name signature_help)))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"signature_help" (maps:get #"op" decoded))
     (is-equal #"map:get" (maps:get #"symbol" decoded))
     (is (xrepl-ops-intelligence:valid-request? decoded))))
@@ -401,16 +401,16 @@
                            (maps:put #"params" params #m())))
          (sigs (list sig-map))
          (resp (xrepl-ops-intelligence:signature-response sigs))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode resp))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode resp))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"done" (maps:get #"status" decoded))
     (is-equal sigs (maps:get #"signatures" decoded))))
 
 (deftest format-request-round-trip
   (let* ((req (xrepl-ops-intelligence:format-request
               #m(code "(defun foo())" op_name format_code)))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"format_code" (maps:get #"op" decoded))
     (is-equal #"(defun foo())" (maps:get #"code" decoded))
     (is (xrepl-ops-intelligence:valid-request? decoded))))
@@ -419,8 +419,8 @@
   (let* ((syms (list #"map:get" #"lists:map"))
          (req (xrepl-ops-intelligence:eldoc-batch-request
                (maps:put 'session #"s1" (maps:put 'symbols syms #m()))))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"eldoc_batch" (maps:get #"op" decoded))
     (is-equal syms (maps:get #"symbols" decoded))
     (is-equal #"s1" (maps:get #"session" decoded))
@@ -429,8 +429,8 @@
 (deftest buffer-analysis-round-trip
   (let* ((req (xrepl-ops-intelligence:buffer-analysis-request
               #m(code "(defun foo ())" file "test.lfe" session "s1")))
-         (`#(ok ,encoded) (xrepl-protocol-msgpack:encode req))
-         (`#(ok ,decoded) (xrepl-protocol-msgpack:decode encoded)))
+         (`#(ok ,encoded) (xrepl-ptcl-msgpack:encode req))
+         (`#(ok ,decoded) (xrepl-ptcl-msgpack:decode encoded)))
     (is-equal #"buffer_analysis" (maps:get #"op" decoded))
     (is-equal #"(defun foo ())" (maps:get #"code" decoded))
     (is-equal #"test.lfe" (maps:get #"file" decoded))

@@ -82,15 +82,15 @@
 
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field opts 'form)
+  (case (xrepl-ptcl-types:get-field opts 'form)
     ('undefined (tuple 'error 'missing-form))
     (form
      (let* ((base (maps:put #"op" #"macroexpand"
-                           (maps:put #"form" (xrepl-protocol-types:ensure-binary form) #m())))
-            (with-once (case (xrepl-protocol-types:get-field opts 'expand_once)
+                           (maps:put #"form" (xrepl-ptcl-types:ensure-binary form) #m())))
+            (with-once (case (xrepl-ptcl-types:get-field opts 'expand_once)
                         ('undefined base)
                         (once (maps:put #"expand_once" once base))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-once 'session 'session opts 'session)))
        with-session))))
 
@@ -106,8 +106,8 @@
 
   Example:
     (macroexpand-response #m(expansion #\"(progn (print 1))\"))"
-  (let ((expansion (xrepl-protocol-types:get-field opts 'expansion #""))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((expansion (xrepl-ptcl-types:get-field opts 'expansion #""))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status
              (maps:put #"expansion" expansion #m()))))
 
@@ -128,12 +128,12 @@
 
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field opts 'form)
+  (case (xrepl-ptcl-types:get-field opts 'form)
     ('undefined (tuple 'error 'missing-form))
     (form
      (let* ((base (maps:put #"op" #"macroexpand_all"
-                           (maps:put #"form" (xrepl-protocol-types:ensure-binary form) #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+                           (maps:put #"form" (xrepl-ptcl-types:ensure-binary form) #m())))
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           base 'session 'session opts 'session)))
        with-session))))
 
@@ -149,8 +149,8 @@
 
   Example:
     (macroexpand-all-response #m(expansion #\"(progn (progn (print 1)))\"))"
-  (let ((expansion (xrepl-protocol-types:get-field opts 'expansion #""))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((expansion (xrepl-ptcl-types:get-field opts 'expansion #""))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status
              (maps:put #"expansion" expansion #m()))))
 
@@ -174,13 +174,13 @@
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
   (let* ((base (maps:put #"op" #"list_macros" #m()))
-         (with-ns (case (xrepl-protocol-types:get-field opts 'namespace)
+         (with-ns (case (xrepl-ptcl-types:get-field opts 'namespace)
                    ('undefined base)
-                   (ns (maps:put #"namespace" (xrepl-protocol-types:ensure-binary ns) base))))
-         (with-pattern (case (xrepl-protocol-types:get-field opts 'pattern)
+                   (ns (maps:put #"namespace" (xrepl-ptcl-types:ensure-binary ns) base))))
+         (with-pattern (case (xrepl-ptcl-types:get-field opts 'pattern)
                         ('undefined with-ns)
-                        (pat (maps:put #"pattern" (xrepl-protocol-types:ensure-binary pat) with-ns))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+                        (pat (maps:put #"pattern" (xrepl-ptcl-types:ensure-binary pat) with-ns))))
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        with-pattern 'session 'session opts 'session)))
     with-session))
 
@@ -197,8 +197,8 @@
 
   Example:
     (list-macros-response `#m(macros ,(list `#m(name #\"defn\" arity 2))))"
-  (let ((macros (xrepl-protocol-types:get-field opts 'macros '()))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((macros (xrepl-ptcl-types:get-field opts 'macros '()))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status
              (maps:put #"macros" macros #m()))))
 
@@ -223,16 +223,16 @@
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
   (let* ((base (maps:put #"op" #"history" #m()))
-         (with-limit (case (xrepl-protocol-types:get-field opts 'limit)
+         (with-limit (case (xrepl-ptcl-types:get-field opts 'limit)
                       ('undefined base)
                       (lim (maps:put #"limit" lim base))))
-         (with-offset (case (xrepl-protocol-types:get-field opts 'offset)
+         (with-offset (case (xrepl-ptcl-types:get-field opts 'offset)
                        ('undefined with-limit)
                        (off (maps:put #"offset" off with-limit))))
-         (with-reverse (case (xrepl-protocol-types:get-field opts 'reverse)
+         (with-reverse (case (xrepl-ptcl-types:get-field opts 'reverse)
                         ('undefined with-offset)
                         (rev (maps:put #"reverse" rev with-offset))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        with-reverse 'session 'session opts 'session)))
     with-session))
 
@@ -250,9 +250,9 @@
 
   Example:
     (history-response `#m(entries ,(list `#m(id 1 command #\"(+ 1 2)\")) total 42))"
-  (let ((entries (xrepl-protocol-types:get-field opts 'entries '()))
-        (total (xrepl-protocol-types:get-field opts 'total 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((entries (xrepl-ptcl-types:get-field opts 'entries '()))
+        (total (xrepl-ptcl-types:get-field opts 'total 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let ((base (maps:put #"status" status
                          (maps:put #"entries" entries #m()))))
       (if (== total 'undefined)
@@ -279,18 +279,18 @@
 
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field opts 'query)
+  (case (xrepl-ptcl-types:get-field opts 'query)
     ('undefined (tuple 'error 'missing-query))
     (query
      (let* ((base (maps:put #"op" #"search_history"
-                           (maps:put #"query" (xrepl-protocol-types:ensure-binary query) #m())))
-            (with-limit (case (xrepl-protocol-types:get-field opts 'limit)
+                           (maps:put #"query" (xrepl-ptcl-types:ensure-binary query) #m())))
+            (with-limit (case (xrepl-ptcl-types:get-field opts 'limit)
                          ('undefined base)
                          (lim (maps:put #"limit" lim base))))
-            (with-case (case (xrepl-protocol-types:get-field opts 'case_sensitive)
+            (with-case (case (xrepl-ptcl-types:get-field opts 'case_sensitive)
                         ('undefined with-limit)
                         (cs (maps:put #"case_sensitive" cs with-limit))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-case 'session 'session opts 'session)))
        with-session))))
 
@@ -307,9 +307,9 @@
 
   Example:
     (search-history-response `#m(matches ,(list `#m(id 5 command #\"(defn foo ...)\")) total_matches 3))"
-  (let ((matches (xrepl-protocol-types:get-field opts 'matches '()))
-        (total (xrepl-protocol-types:get-field opts 'total_matches 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((matches (xrepl-ptcl-types:get-field opts 'matches '()))
+        (total (xrepl-ptcl-types:get-field opts 'total_matches 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let ((base (maps:put #"status" status
                          (maps:put #"matches" matches #m()))))
       (if (== total 'undefined)
@@ -337,13 +337,13 @@
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
   (let* ((base (maps:put #"op" #"profile_start" #m()))
-         (with-target (case (xrepl-protocol-types:get-field opts 'target)
+         (with-target (case (xrepl-ptcl-types:get-field opts 'target)
                        ('undefined base)
-                       (tgt (maps:put #"target" (xrepl-protocol-types:ensure-binary tgt) base))))
-         (with-options (case (xrepl-protocol-types:get-field opts 'options)
+                       (tgt (maps:put #"target" (xrepl-ptcl-types:ensure-binary tgt) base))))
+         (with-options (case (xrepl-ptcl-types:get-field opts 'options)
                         ('undefined with-target)
                         (opts-map (maps:put #"options" opts-map with-target))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        with-options 'session 'session opts 'session)))
     with-session))
 
@@ -359,8 +359,8 @@
 
   Example:
     (profile-start-response #m(profile_id #\"prof-12345\"))"
-  (let ((prof-id (xrepl-protocol-types:get-field opts 'profile_id 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((prof-id (xrepl-ptcl-types:get-field opts 'profile_id 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let ((base (maps:put #"status" status #m())))
       (if (== prof-id 'undefined)
         base
@@ -386,13 +386,13 @@
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
   (let* ((base (maps:put #"op" #"profile_stop" #m()))
-         (with-id (case (xrepl-protocol-types:get-field opts 'profile_id)
+         (with-id (case (xrepl-ptcl-types:get-field opts 'profile_id)
                    ('undefined base)
-                   (pid (maps:put #"profile_id" (xrepl-protocol-types:ensure-binary pid) base))))
-         (with-format (case (xrepl-protocol-types:get-field opts 'format)
+                   (pid (maps:put #"profile_id" (xrepl-ptcl-types:ensure-binary pid) base))))
+         (with-format (case (xrepl-ptcl-types:get-field opts 'format)
                        ('undefined with-id)
-                       (fmt (maps:put #"format" (xrepl-protocol-types:ensure-binary fmt) with-id))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+                       (fmt (maps:put #"format" (xrepl-ptcl-types:ensure-binary fmt) with-id))))
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        with-format 'session 'session opts 'session)))
     with-session))
 
@@ -409,9 +409,9 @@
 
   Example:
     (profile-stop-response #m(results `#m(total_calls 1234 time_ms 567) elapsed_ms 10000))"
-  (let ((results (xrepl-protocol-types:get-field opts 'results #m()))
-        (elapsed (xrepl-protocol-types:get-field opts 'elapsed_ms 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((results (xrepl-ptcl-types:get-field opts 'results #m()))
+        (elapsed (xrepl-ptcl-types:get-field opts 'elapsed_ms 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let ((base (maps:put #"status" status
                          (maps:put #"results" results #m()))))
       (if (== elapsed 'undefined)
@@ -438,18 +438,18 @@
 
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field opts 'code)
+  (case (xrepl-ptcl-types:get-field opts 'code)
     ('undefined (tuple 'error 'missing-code))
     (code
      (let* ((base (maps:put #"op" #"benchmark"
-                           (maps:put #"code" (xrepl-protocol-types:ensure-binary code) #m())))
-            (with-iters (case (xrepl-protocol-types:get-field opts 'iterations)
+                           (maps:put #"code" (xrepl-ptcl-types:ensure-binary code) #m())))
+            (with-iters (case (xrepl-ptcl-types:get-field opts 'iterations)
                          ('undefined base)
                          (iters (maps:put #"iterations" iters base))))
-            (with-warmup (case (xrepl-protocol-types:get-field opts 'warmup)
+            (with-warmup (case (xrepl-ptcl-types:get-field opts 'warmup)
                           ('undefined with-iters)
                           (warm (maps:put #"warmup" warm with-iters))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-warmup 'session 'session opts 'session)))
        with-session))))
 
@@ -468,11 +468,11 @@
 
   Example:
     (benchmark-response #m(mean_us 123.45 median_us 120.0 iterations 10000))"
-  (let ((mean (xrepl-protocol-types:get-field opts 'mean_us 0.0))
-        (median (xrepl-protocol-types:get-field opts 'median_us 'undefined))
-        (stddev (xrepl-protocol-types:get-field opts 'std_dev_us 'undefined))
-        (iters (xrepl-protocol-types:get-field opts 'iterations 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((mean (xrepl-ptcl-types:get-field opts 'mean_us 0.0))
+        (median (xrepl-ptcl-types:get-field opts 'median_us 'undefined))
+        (stddev (xrepl-ptcl-types:get-field opts 'std_dev_us 'undefined))
+        (iters (xrepl-ptcl-types:get-field opts 'iterations 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let* ((base (maps:put #"status" status
                           (maps:put #"mean_us" mean #m())))
            (with-median (if (== median 'undefined) base (maps:put #"median_us" median base)))
@@ -500,13 +500,13 @@
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
   (let* ((base (maps:put #"op" #"snippets" #m()))
-         (with-cat (case (xrepl-protocol-types:get-field opts 'category)
+         (with-cat (case (xrepl-ptcl-types:get-field opts 'category)
                     ('undefined base)
-                    (cat (maps:put #"category" (xrepl-protocol-types:ensure-binary cat) base))))
-         (with-lang (case (xrepl-protocol-types:get-field opts 'language)
+                    (cat (maps:put #"category" (xrepl-ptcl-types:ensure-binary cat) base))))
+         (with-lang (case (xrepl-ptcl-types:get-field opts 'language)
                      ('undefined with-cat)
-                     (lang (maps:put #"language" (xrepl-protocol-types:ensure-binary lang) with-cat))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+                     (lang (maps:put #"language" (xrepl-ptcl-types:ensure-binary lang) with-cat))))
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        with-lang 'session 'session opts 'session)))
     with-session))
 
@@ -523,8 +523,8 @@
 
   Example:
     (snippets-response `#m(snippets ,(list `#m(id #\"for-loop\" name #\"For Loop\"))))"
-  (let ((snippets (xrepl-protocol-types:get-field opts 'snippets '()))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((snippets (xrepl-ptcl-types:get-field opts 'snippets '()))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status
              (maps:put #"snippets" snippets #m()))))
 
@@ -548,17 +548,17 @@
   Notes:
     - Supports both 'id' and 'snippet_id' as field names
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field-any opts '(id snippet_id))
+  (case (xrepl-ptcl-types:get-field-any opts '(id snippet_id))
     ('undefined (tuple 'error 'missing-id))
     (id
      (let* ((base (maps:put #"op" #"expand_snippet"
-                           (xrepl-protocol-types:put-aliased
+                           (xrepl-ptcl-types:put-aliased
                             #m() 'id 'snippet_id
-                            (xrepl-protocol-types:ensure-binary id))))
-            (with-params (case (xrepl-protocol-types:get-field opts 'params)
+                            (xrepl-ptcl-types:ensure-binary id))))
+            (with-params (case (xrepl-ptcl-types:get-field opts 'params)
                           ('undefined base)
                           (params (maps:put #"params" params base))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-params 'session 'session opts 'session)))
        with-session))))
 
@@ -575,9 +575,9 @@
 
   Example:
     (expand-snippet-response #m(code #\"(for [i (range 10)] (print i))\"))"
-  (let ((code (xrepl-protocol-types:get-field opts 'code #""))
-        (placeholders (xrepl-protocol-types:get-field opts 'placeholders 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((code (xrepl-ptcl-types:get-field opts 'code #""))
+        (placeholders (xrepl-ptcl-types:get-field opts 'placeholders 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let ((base (maps:put #"status" status
                          (maps:put #"code" code #m()))))
       (if (== placeholders 'undefined)
@@ -605,23 +605,23 @@
 
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field opts 'name)
+  (case (xrepl-ptcl-types:get-field opts 'name)
     ('undefined (tuple 'error 'missing-name))
     (name
      (let* ((base (maps:put #"op" #"generate_function"
-                           (maps:put #"name" (xrepl-protocol-types:ensure-binary name) #m())))
-            (with-arity (case (xrepl-protocol-types:get-field opts 'arity)
+                           (maps:put #"name" (xrepl-ptcl-types:ensure-binary name) #m())))
+            (with-arity (case (xrepl-ptcl-types:get-field opts 'arity)
                          ('undefined base)
                          (ar (maps:put #"arity" ar base))))
-            (with-params (case (xrepl-protocol-types:get-field opts 'params)
+            (with-params (case (xrepl-ptcl-types:get-field opts 'params)
                           ('undefined with-arity)
                           (params (maps:put #"params"
-                                           (lists:map #'xrepl-protocol-types:ensure-binary/1 params)
+                                           (lists:map #'xrepl-ptcl-types:ensure-binary/1 params)
                                            with-arity))))
-            (with-doc (case (xrepl-protocol-types:get-field opts 'doc)
+            (with-doc (case (xrepl-ptcl-types:get-field opts 'doc)
                        ('undefined with-params)
-                       (doc (maps:put #"doc" (xrepl-protocol-types:ensure-binary doc) with-params))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+                       (doc (maps:put #"doc" (xrepl-ptcl-types:ensure-binary doc) with-params))))
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-doc 'session 'session opts 'session)))
        with-session))))
 
@@ -637,8 +637,8 @@
 
   Example:
     (generate-function-response #m(code #\"(defun my-func () ...)\"))"
-  (let ((code (xrepl-protocol-types:get-field opts 'code #""))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((code (xrepl-ptcl-types:get-field opts 'code #""))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status
              (maps:put #"code" code #m()))))
 
@@ -662,20 +662,20 @@
 
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field opts 'code)
+  (case (xrepl-ptcl-types:get-field opts 'code)
     ('undefined (tuple 'error 'missing-code))
     (code
      (let* ((base (maps:put #"op" #"suggest_improvements"
-                           (maps:put #"code" (xrepl-protocol-types:ensure-binary code) #m())))
-            (with-context (case (xrepl-protocol-types:get-field opts 'context)
+                           (maps:put #"code" (xrepl-ptcl-types:ensure-binary code) #m())))
+            (with-context (case (xrepl-ptcl-types:get-field opts 'context)
                            ('undefined base)
-                           (ctx (maps:put #"context" (xrepl-protocol-types:ensure-binary ctx) base))))
-            (with-focus (case (xrepl-protocol-types:get-field opts 'focus)
+                           (ctx (maps:put #"context" (xrepl-ptcl-types:ensure-binary ctx) base))))
+            (with-focus (case (xrepl-ptcl-types:get-field opts 'focus)
                          ('undefined with-context)
                          (focus (maps:put #"focus"
-                                         (lists:map #'xrepl-protocol-types:ensure-binary/1 focus)
+                                         (lists:map #'xrepl-ptcl-types:ensure-binary/1 focus)
                                          with-context))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-focus 'session 'session opts 'session)))
        with-session))))
 
@@ -693,8 +693,8 @@
   Example:
     (suggest-improvements-response
       `#m(suggestions ,(list `#m(type #\"performance\" description #\"Use map instead of lists\"))))"
-  (let ((suggestions (xrepl-protocol-types:get-field opts 'suggestions '()))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((suggestions (xrepl-ptcl-types:get-field opts 'suggestions '()))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status
              (maps:put #"suggestions" suggestions #m()))))
 
@@ -718,15 +718,15 @@
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
   (let* ((base (maps:put #"op" #"share_session" #m()))
-         (with-include (case (xrepl-protocol-types:get-field opts 'include)
+         (with-include (case (xrepl-ptcl-types:get-field opts 'include)
                         ('undefined base)
                         (inc (maps:put #"include"
-                                      (lists:map #'xrepl-protocol-types:ensure-binary/1 inc)
+                                      (lists:map #'xrepl-ptcl-types:ensure-binary/1 inc)
                                       base))))
-         (with-expiry (case (xrepl-protocol-types:get-field opts 'expiry)
+         (with-expiry (case (xrepl-ptcl-types:get-field opts 'expiry)
                        ('undefined with-include)
                        (exp (maps:put #"expiry" exp with-include))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                        with-expiry 'session 'session opts 'session)))
     with-session))
 
@@ -744,10 +744,10 @@
 
   Example:
     (share-session-response #m(share_id #\"share-abc123\" url #\"https://...\"))"
-  (let ((share-id (xrepl-protocol-types:get-field opts 'share_id #""))
-        (url (xrepl-protocol-types:get-field opts 'url 'undefined))
-        (expires (xrepl-protocol-types:get-field opts 'expires_at 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((share-id (xrepl-ptcl-types:get-field opts 'share_id #""))
+        (url (xrepl-ptcl-types:get-field opts 'url 'undefined))
+        (expires (xrepl-ptcl-types:get-field opts 'expires_at 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let* ((base (maps:put #"status" status
                           (maps:put #"share_id" share-id #m())))
            (with-url (if (== url 'undefined) base (maps:put #"url" url base)))
@@ -773,15 +773,15 @@
 
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field opts 'share_id)
+  (case (xrepl-ptcl-types:get-field opts 'share_id)
     ('undefined (tuple 'error 'missing-share-id))
     (share-id
      (let* ((base (maps:put #"op" #"restore_session"
-                           (maps:put #"share_id" (xrepl-protocol-types:ensure-binary share-id) #m())))
-            (with-merge (case (xrepl-protocol-types:get-field opts 'merge)
+                           (maps:put #"share_id" (xrepl-ptcl-types:ensure-binary share-id) #m())))
+            (with-merge (case (xrepl-ptcl-types:get-field opts 'merge)
                          ('undefined base)
                          (merge (maps:put #"merge" merge base))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           with-merge 'session 'session opts 'session)))
        with-session))))
 
@@ -797,8 +797,8 @@
 
   Example:
     (restore-session-response `#m(restored ,(list #\"history\" #\"bindings\")))"
-  (let ((restored (xrepl-protocol-types:get-field opts 'restored 'undefined))
-        (status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((restored (xrepl-ptcl-types:get-field opts 'restored 'undefined))
+        (status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (let ((base (maps:put #"status" status #m())))
       (if (== restored 'undefined)
         base
@@ -825,18 +825,18 @@
 
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
-  (let ((uri (xrepl-protocol-types:get-field opts 'uri))
-        (lang (xrepl-protocol-types:get-field opts 'language_id))
-        (ver (xrepl-protocol-types:get-field opts 'version))
-        (text (xrepl-protocol-types:get-field opts 'text)))
+  (let ((uri (xrepl-ptcl-types:get-field opts 'uri))
+        (lang (xrepl-ptcl-types:get-field opts 'language_id))
+        (ver (xrepl-ptcl-types:get-field opts 'version))
+        (text (xrepl-ptcl-types:get-field opts 'text)))
     (if (or (== uri 'undefined) (== lang 'undefined) (== ver 'undefined) (== text 'undefined))
       (tuple 'error 'missing-required-fields)
       (let* ((base (maps:put #"op" #"text_document_did_open"
-                            (maps:put #"uri" (xrepl-protocol-types:ensure-binary uri)
-                                     (maps:put #"language_id" (xrepl-protocol-types:ensure-binary lang)
+                            (maps:put #"uri" (xrepl-ptcl-types:ensure-binary uri)
+                                     (maps:put #"language_id" (xrepl-ptcl-types:ensure-binary lang)
                                               (maps:put #"version" ver
-                                                       (maps:put #"text" (xrepl-protocol-types:ensure-binary text) #m()))))))
-             (with-session (xrepl-protocol-types:maybe-put-aliased
+                                                       (maps:put #"text" (xrepl-ptcl-types:ensure-binary text) #m()))))))
+             (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
         with-session))))
 
@@ -851,7 +851,7 @@
 
   Example:
     (text-document-did-open-response #m())"
-  (let ((status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status #m())))
 
 ;;; text_document_did_change operation
@@ -876,16 +876,16 @@
 
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
-  (let ((uri (xrepl-protocol-types:get-field opts 'uri))
-        (ver (xrepl-protocol-types:get-field opts 'version))
-        (changes (xrepl-protocol-types:get-field opts 'content_changes)))
+  (let ((uri (xrepl-ptcl-types:get-field opts 'uri))
+        (ver (xrepl-ptcl-types:get-field opts 'version))
+        (changes (xrepl-ptcl-types:get-field opts 'content_changes)))
     (if (or (== uri 'undefined) (== ver 'undefined) (== changes 'undefined))
       (tuple 'error 'missing-required-fields)
       (let* ((base (maps:put #"op" #"text_document_did_change"
-                            (maps:put #"uri" (xrepl-protocol-types:ensure-binary uri)
+                            (maps:put #"uri" (xrepl-ptcl-types:ensure-binary uri)
                                      (maps:put #"version" ver
                                               (maps:put #"content_changes" changes #m())))))
-             (with-session (xrepl-protocol-types:maybe-put-aliased
+             (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
         with-session))))
 
@@ -900,7 +900,7 @@
 
   Example:
     (text-document-did-change-response #m())"
-  (let ((status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status #m())))
 
 ;;; text_document_did_close operation
@@ -920,12 +920,12 @@
 
   Notes:
     - Binary keys used throughout for MessagePack efficiency"
-  (case (xrepl-protocol-types:get-field opts 'uri)
+  (case (xrepl-ptcl-types:get-field opts 'uri)
     ('undefined (tuple 'error 'missing-uri))
     (uri
      (let* ((base (maps:put #"op" #"text_document_did_close"
-                           (maps:put #"uri" (xrepl-protocol-types:ensure-binary uri) #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+                           (maps:put #"uri" (xrepl-ptcl-types:ensure-binary uri) #m())))
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                           base 'session 'session opts 'session)))
        with-session))))
 
@@ -940,7 +940,7 @@
 
   Example:
     (text-document-did-close-response #m())"
-  (let ((status (xrepl-protocol-types:get-field opts 'status #"done")))
+  (let ((status (xrepl-ptcl-types:get-field opts 'status #"done")))
     (maps:put #"status" status #m())))
 
 ;;; Parsing functions
@@ -953,79 +953,79 @@
 
   Returns:
     Tuple of (ok, parsed-request-map) or (error, reason)"
-  (let ((op (xrepl-protocol-types:get-field message 'op)))
+  (let ((op (xrepl-ptcl-types:get-field message 'op)))
     (cond
       ;; macroexpand
       ((or (== op #"macroexpand") (== op 'macroexpand))
-       (let ((form (xrepl-protocol-types:get-field message 'form))
-             (once (xrepl-protocol-types:get-field message 'expand_once))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((form (xrepl-ptcl-types:get-field message 'form))
+             (once (xrepl-ptcl-types:get-field message 'expand_once))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (== form 'undefined)
            (tuple 'error 'missing-form)
            (let* ((base (maps:put #"op" #"macroexpand"
-                                 (maps:put #"form" (xrepl-protocol-types:ensure-binary form) #m())))
+                                 (maps:put #"form" (xrepl-ptcl-types:ensure-binary form) #m())))
                   (with-once (if (== once 'undefined) base (maps:put #"expand_once" once base)))
                   (with-session (if (== session 'undefined)
                                   with-once
-                                  (maps:put #"session" (xrepl-protocol-types:ensure-binary session) with-once))))
+                                  (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) with-once))))
              (tuple 'ok with-session)))))
 
       ;; macroexpand_all
       ((or (== op #"macroexpand_all") (== op 'macroexpand_all))
-       (let ((form (xrepl-protocol-types:get-field message 'form))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((form (xrepl-ptcl-types:get-field message 'form))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (== form 'undefined)
            (tuple 'error 'missing-form)
            (let* ((base (maps:put #"op" #"macroexpand_all"
-                                 (maps:put #"form" (xrepl-protocol-types:ensure-binary form) #m())))
+                                 (maps:put #"form" (xrepl-ptcl-types:ensure-binary form) #m())))
                   (with-session (if (== session 'undefined)
                                   base
-                                  (maps:put #"session" (xrepl-protocol-types:ensure-binary session) base))))
+                                  (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) base))))
              (tuple 'ok with-session)))))
 
       ;; list_macros
       ((or (== op #"list_macros") (== op 'list_macros))
-       (let ((ns (xrepl-protocol-types:get-field message 'namespace))
-             (pat (xrepl-protocol-types:get-field message 'pattern))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((ns (xrepl-ptcl-types:get-field message 'namespace))
+             (pat (xrepl-ptcl-types:get-field message 'pattern))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (let* ((base (maps:put #"op" #"list_macros" #m()))
-                (with-ns (if (== ns 'undefined) base (maps:put #"namespace" (xrepl-protocol-types:ensure-binary ns) base)))
-                (with-pat (if (== pat 'undefined) with-ns (maps:put #"pattern" (xrepl-protocol-types:ensure-binary pat) with-ns)))
+                (with-ns (if (== ns 'undefined) base (maps:put #"namespace" (xrepl-ptcl-types:ensure-binary ns) base)))
+                (with-pat (if (== pat 'undefined) with-ns (maps:put #"pattern" (xrepl-ptcl-types:ensure-binary pat) with-ns)))
                 (with-session (if (== session 'undefined)
                                 with-pat
-                                (maps:put #"session" (xrepl-protocol-types:ensure-binary session) with-pat))))
+                                (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) with-pat))))
            (tuple 'ok with-session))))
 
       ;; history
       ((or (== op #"history") (== op 'history))
-       (let ((lim (xrepl-protocol-types:get-field message 'limit))
-             (off (xrepl-protocol-types:get-field message 'offset))
-             (rev (xrepl-protocol-types:get-field message 'reverse))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((lim (xrepl-ptcl-types:get-field message 'limit))
+             (off (xrepl-ptcl-types:get-field message 'offset))
+             (rev (xrepl-ptcl-types:get-field message 'reverse))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (let* ((base (maps:put #"op" #"history" #m()))
                 (with-lim (if (== lim 'undefined) base (maps:put #"limit" lim base)))
                 (with-off (if (== off 'undefined) with-lim (maps:put #"offset" off with-lim)))
                 (with-rev (if (== rev 'undefined) with-off (maps:put #"reverse" rev with-off)))
                 (with-session (if (== session 'undefined)
                                 with-rev
-                                (maps:put #"session" (xrepl-protocol-types:ensure-binary session) with-rev))))
+                                (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) with-rev))))
            (tuple 'ok with-session))))
 
       ;; search_history
       ((or (== op #"search_history") (== op 'search_history))
-       (let ((query (xrepl-protocol-types:get-field message 'query))
-             (lim (xrepl-protocol-types:get-field message 'limit))
-             (cs (xrepl-protocol-types:get-field message 'case_sensitive))
-             (session (xrepl-protocol-types:get-field message 'session)))
+       (let ((query (xrepl-ptcl-types:get-field message 'query))
+             (lim (xrepl-ptcl-types:get-field message 'limit))
+             (cs (xrepl-ptcl-types:get-field message 'case_sensitive))
+             (session (xrepl-ptcl-types:get-field message 'session)))
          (if (== query 'undefined)
            (tuple 'error 'missing-query)
            (let* ((base (maps:put #"op" #"search_history"
-                                 (maps:put #"query" (xrepl-protocol-types:ensure-binary query) #m())))
+                                 (maps:put #"query" (xrepl-ptcl-types:ensure-binary query) #m())))
                   (with-lim (if (== lim 'undefined) base (maps:put #"limit" lim base)))
                   (with-cs (if (== cs 'undefined) with-lim (maps:put #"case_sensitive" cs with-lim)))
                   (with-session (if (== session 'undefined)
                                   with-cs
-                                  (maps:put #"session" (xrepl-protocol-types:ensure-binary session) with-cs))))
+                                  (maps:put #"session" (xrepl-ptcl-types:ensure-binary session) with-cs))))
              (tuple 'ok with-session)))))
 
       ;; Additional operations follow same pattern...
@@ -1043,7 +1043,7 @@
            (== op #"text_document_did_change") (== op 'text_document_did_change)
            (== op #"text_document_did_close") (== op 'text_document_did_close))
        ;; Simplified parsing - just normalize op name
-       (tuple 'ok (maps:put #"op" (xrepl-protocol-types:ensure-binary op) message)))
+       (tuple 'ok (maps:put #"op" (xrepl-ptcl-types:ensure-binary op) message)))
 
       ('true (tuple 'error 'unknown-operation)))))
 
@@ -1057,7 +1057,7 @@
   Returns:
     Tuple of (ok, parsed-response-map) or (error, reason)"
   ;; Simplified - just ensure status field exists
-  (let ((status (xrepl-protocol-types:get-field message 'status #"done")))
+  (let ((status (xrepl-ptcl-types:get-field message 'status #"done")))
     (tuple 'ok (maps:put #"status" status message))))
 
 ;;; Validation functions
@@ -1070,42 +1070,42 @@
 
   Returns:
     true if valid, false otherwise"
-  (let ((op (xrepl-protocol-types:get-field message 'op)))
+  (let ((op (xrepl-ptcl-types:get-field message 'op)))
     (cond
       ;; Operations with required fields
       ((or (== op #"macroexpand") (== op 'macroexpand)
            (== op #"macroexpand_all") (== op 'macroexpand_all))
-       (/= (xrepl-protocol-types:get-field message 'form) 'undefined))
+       (/= (xrepl-ptcl-types:get-field message 'form) 'undefined))
 
       ((or (== op #"search_history") (== op 'search_history))
-       (/= (xrepl-protocol-types:get-field message 'query) 'undefined))
+       (/= (xrepl-ptcl-types:get-field message 'query) 'undefined))
 
       ((or (== op #"benchmark") (== op 'benchmark)
            (== op #"suggest_improvements") (== op 'suggest_improvements))
-       (/= (xrepl-protocol-types:get-field message 'code) 'undefined))
+       (/= (xrepl-ptcl-types:get-field message 'code) 'undefined))
 
       ((or (== op #"expand_snippet") (== op 'expand_snippet))
-       (/= (xrepl-protocol-types:get-field-any message '(id snippet_id)) 'undefined))
+       (/= (xrepl-ptcl-types:get-field-any message '(id snippet_id)) 'undefined))
 
       ((or (== op #"generate_function") (== op 'generate_function))
-       (/= (xrepl-protocol-types:get-field message 'name) 'undefined))
+       (/= (xrepl-ptcl-types:get-field message 'name) 'undefined))
 
       ((or (== op #"restore_session") (== op 'restore_session))
-       (/= (xrepl-protocol-types:get-field message 'share_id) 'undefined))
+       (/= (xrepl-ptcl-types:get-field message 'share_id) 'undefined))
 
       ((or (== op #"text_document_did_open") (== op 'text_document_did_open))
-       (andalso (/= (xrepl-protocol-types:get-field message 'uri) 'undefined)
-                (/= (xrepl-protocol-types:get-field message 'language_id) 'undefined)
-                (/= (xrepl-protocol-types:get-field message 'version) 'undefined)
-                (/= (xrepl-protocol-types:get-field message 'text) 'undefined)))
+       (andalso (/= (xrepl-ptcl-types:get-field message 'uri) 'undefined)
+                (/= (xrepl-ptcl-types:get-field message 'language_id) 'undefined)
+                (/= (xrepl-ptcl-types:get-field message 'version) 'undefined)
+                (/= (xrepl-ptcl-types:get-field message 'text) 'undefined)))
 
       ((or (== op #"text_document_did_change") (== op 'text_document_did_change))
-       (andalso (/= (xrepl-protocol-types:get-field message 'uri) 'undefined)
-                (/= (xrepl-protocol-types:get-field message 'version) 'undefined)
-                (/= (xrepl-protocol-types:get-field message 'content_changes) 'undefined)))
+       (andalso (/= (xrepl-ptcl-types:get-field message 'uri) 'undefined)
+                (/= (xrepl-ptcl-types:get-field message 'version) 'undefined)
+                (/= (xrepl-ptcl-types:get-field message 'content_changes) 'undefined)))
 
       ((or (== op #"text_document_did_close") (== op 'text_document_did_close))
-       (/= (xrepl-protocol-types:get-field message 'uri) 'undefined))
+       (/= (xrepl-ptcl-types:get-field message 'uri) 'undefined))
 
       ;; Operations with no required fields
       ((or (== op #"list_macros") (== op 'list_macros)
@@ -1128,7 +1128,7 @@
   Returns:
     true if valid, false otherwise"
   ;; All responses must have status
-  (/= (xrepl-protocol-types:get-field message 'status) 'undefined))
+  (/= (xrepl-ptcl-types:get-field message 'status) 'undefined))
 
 ;;; Error handling
 

@@ -49,19 +49,19 @@
   Example:
     (set-breakpoint-request #m(file \"src/foo.lfe\" line 42))
     (set-breakpoint-request #m(file \"test.lfe\" line 10 condition \"x > 5\"))"
-  (case (xrepl-protocol-types:get-required opts 'file)
+  (case (xrepl-ptcl-types:get-required opts 'file)
     (`#(ok ,file)
-     (case (xrepl-protocol-types:get-required opts 'line)
+     (case (xrepl-ptcl-types:get-required opts 'line)
        (`#(ok ,line)
         (let* ((base (maps:put #"op" #"set_breakpoint"
-                              (maps:put #"file" (xrepl-protocol-types:ensure-binary file)
+                              (maps:put #"file" (xrepl-ptcl-types:ensure-binary file)
                                        (maps:put #"line" line #m()))))
-               (with-condition (case (xrepl-protocol-types:get-field opts 'condition 'undefined)
+               (with-condition (case (xrepl-ptcl-types:get-field opts 'condition 'undefined)
                                 ('undefined base)
                                 (cond (maps:put #"condition"
-                                               (xrepl-protocol-types:ensure-binary cond)
+                                               (xrepl-ptcl-types:ensure-binary cond)
                                                base))))
-               (with-session (xrepl-protocol-types:maybe-put-aliased
+               (with-session (xrepl-ptcl-types:maybe-put-aliased
                               with-condition 'session 'session opts 'session)))
           with-session))
        (error error)))
@@ -99,12 +99,12 @@
   Example:
     (clear-breakpoint-request #m(id \"bp-1\"))
     (clear-breakpoint-request #m(id \"bp-2\" session \"s1\"))"
-  (case (xrepl-protocol-types:get-required opts 'id)
+  (case (xrepl-ptcl-types:get-required opts 'id)
     (`#(ok ,id)
      (let* ((base (maps:put #"op" #"clear_breakpoint"
-                           (maps:put #"id" (xrepl-protocol-types:ensure-binary id)
+                           (maps:put #"id" (xrepl-ptcl-types:ensure-binary id)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -138,7 +138,7 @@
     (list-breakpoints-request #m())
     (list-breakpoints-request #m(session \"s1\"))"
   (let* ((base (maps:put #"op" #"list_breakpoints" #m()))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                         base 'session 'session opts 'session)))
     with-session))
 
@@ -172,7 +172,7 @@
     (stacktrace-request #m())
     (stacktrace-request #m(session \"s1\"))"
   (let* ((base (maps:put #"op" #"stacktrace" #m()))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                         base 'session 'session opts 'session)))
     with-session))
 
@@ -207,10 +207,10 @@
     (inspect-locals-request #m())
     (inspect-locals-request #m(frame 2 session \"s1\"))"
   (let* ((base (maps:put #"op" #"inspect_locals" #m()))
-         (with-frame (case (xrepl-protocol-types:get-field opts 'frame 'undefined)
+         (with-frame (case (xrepl-ptcl-types:get-field opts 'frame 'undefined)
                       ('undefined base)
                       (frame (maps:put #"frame" frame base))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                         with-frame 'session 'session opts 'session)))
     with-session))
 
@@ -244,15 +244,15 @@
   Example:
     (eval-in-frame-request #m(code \"x + y\"))
     (eval-in-frame-request #m(code \"foo(x)\" frame 2 session \"s1\"))"
-  (case (xrepl-protocol-types:get-required opts 'code)
+  (case (xrepl-ptcl-types:get-required opts 'code)
     (`#(ok ,code)
      (let* ((base (maps:put #"op" #"eval_in_frame"
-                           (maps:put #"code" (xrepl-protocol-types:ensure-binary code)
+                           (maps:put #"code" (xrepl-ptcl-types:ensure-binary code)
                                     #m())))
-            (with-frame (case (xrepl-protocol-types:get-field opts 'frame 'undefined)
+            (with-frame (case (xrepl-ptcl-types:get-field opts 'frame 'undefined)
                          ('undefined base)
                          (frame (maps:put #"frame" frame base))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            with-frame 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -269,7 +269,7 @@
   Example:
     (eval-in-frame-response #\"47\")"
   (maps:put #"status" #"done"
-           (maps:put #"value" (xrepl-protocol-types:ensure-binary result)
+           (maps:put #"value" (xrepl-ptcl-types:ensure-binary result)
                     #m())))
 
 ;;; step operation
@@ -288,12 +288,12 @@
     (step-request #m())
     (step-request #m(type \"into\" session \"s1\"))"
   (let* ((base (maps:put #"op" #"step" #m()))
-         (with-type (case (xrepl-protocol-types:get-field opts 'type 'undefined)
+         (with-type (case (xrepl-ptcl-types:get-field opts 'type 'undefined)
                      ('undefined base)
                      (step-type (maps:put #"type"
-                                         (xrepl-protocol-types:ensure-binary step-type)
+                                         (xrepl-ptcl-types:ensure-binary step-type)
                                          base))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                         with-type 'session 'session opts 'session)))
     with-session))
 
@@ -322,12 +322,12 @@
   Returns:
     #(ok parsed-request) | #(error reason)"
   (try
-    (let ((op (xrepl-protocol-types:get-field message 'op)))
+    (let ((op (xrepl-ptcl-types:get-field message 'op)))
       (cond
         ;; set_breakpoint operation
         ((or (== op #"set_breakpoint") (== op 'set_breakpoint))
-         (let ((file (xrepl-protocol-types:get-field message 'file))
-               (line (xrepl-protocol-types:get-field message 'line)))
+         (let ((file (xrepl-ptcl-types:get-field message 'file))
+               (line (xrepl-ptcl-types:get-field message 'line)))
            (if (or (== file 'undefined) (== line 'undefined))
              (tuple 'error 'missing-required-field)
              (tuple 'ok (maps:put #"op" #"set_breakpoint"
@@ -336,7 +336,7 @@
 
         ;; clear_breakpoint operation
         ((or (== op #"clear_breakpoint") (== op 'clear_breakpoint))
-         (let ((id (xrepl-protocol-types:get-field message 'id)))
+         (let ((id (xrepl-ptcl-types:get-field message 'id)))
            (if (== id 'undefined)
              (tuple 'error 'missing-id)
              (tuple 'ok (maps:put #"op" #"clear_breakpoint"
@@ -356,7 +356,7 @@
 
         ;; eval_in_frame operation
         ((or (== op #"eval_in_frame") (== op 'eval_in_frame))
-         (let ((code (xrepl-protocol-types:get-field message 'code)))
+         (let ((code (xrepl-ptcl-types:get-field message 'code)))
            (if (== code 'undefined)
              (tuple 'error 'missing-code)
              (tuple 'ok (maps:put #"op" #"eval_in_frame"
@@ -380,13 +380,13 @@
 
   Returns:
     #(ok result-map) | #(error error-info)"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (cond
       ((or (== status #"done") (== status 'done))
        (tuple 'ok message))  ;; Simple pass-through for now
 
       ((or (== status #"error") (== status 'error))
-       (tuple 'error (xrepl-protocol-types:get-field message 'error)))
+       (tuple 'error (xrepl-ptcl-types:get-field message 'error)))
 
       ('true (tuple 'error 'invalid-status)))))
 
@@ -411,7 +411,7 @@
 
   Returns:
     true | false"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (or (== status #"done")
         (== status 'done)
         (== status #"error")
@@ -428,4 +428,4 @@
 
   Returns:
     Error response map"
-  (xrepl-protocol-types:error-response error-type message))
+  (xrepl-ptcl-types:error-response error-type message))

@@ -45,24 +45,24 @@
   Example:
     (find-definition-request #m(symbol \"map:get\"))
     (find-definition-request #m(symbol \"foo\" file \"test.lfe\" line 10 column 5))"
-  (case (xrepl-protocol-types:get-required opts 'symbol)
+  (case (xrepl-ptcl-types:get-required opts 'symbol)
     (`#(ok ,symbol)
      (let* ((base (maps:put #"op" #"find_definition"
-                           (maps:put #"symbol" (xrepl-protocol-types:ensure-binary symbol)
+                           (maps:put #"symbol" (xrepl-ptcl-types:ensure-binary symbol)
                                     #m())))
-            (with-file (case (xrepl-protocol-types:get-field opts 'file 'undefined)
+            (with-file (case (xrepl-ptcl-types:get-field opts 'file 'undefined)
                         ('undefined base)
-                        (file (maps:put #"file" (xrepl-protocol-types:ensure-binary file) base))))
-            (with-line (case (xrepl-protocol-types:get-field opts 'line 'undefined)
+                        (file (maps:put #"file" (xrepl-ptcl-types:ensure-binary file) base))))
+            (with-line (case (xrepl-ptcl-types:get-field opts 'line 'undefined)
                         ('undefined with-file)
                         (line (maps:put #"line" line with-file))))
-            (with-column (case (xrepl-protocol-types:get-field opts 'column 'undefined)
+            (with-column (case (xrepl-ptcl-types:get-field opts 'column 'undefined)
                           ('undefined with-line)
                           (col (maps:put #"column" col with-line))))
-            (with-position (case (xrepl-protocol-types:get-field opts 'position 'undefined)
+            (with-position (case (xrepl-ptcl-types:get-field opts 'position 'undefined)
                             ('undefined with-column)
                             (pos (maps:put #"position" pos with-column))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            with-position 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -101,24 +101,24 @@
   Example:
     (find-references-request #m(symbol \"map:get\"))
     (find-references-request #m(symbol \"foo\" include_declaration true))"
-  (case (xrepl-protocol-types:get-required opts 'symbol)
+  (case (xrepl-ptcl-types:get-required opts 'symbol)
     (`#(ok ,symbol)
      (let* ((base (maps:put #"op" #"find_references"
-                           (maps:put #"symbol" (xrepl-protocol-types:ensure-binary symbol)
+                           (maps:put #"symbol" (xrepl-ptcl-types:ensure-binary symbol)
                                     #m())))
-            (with-file (case (xrepl-protocol-types:get-field opts 'file 'undefined)
+            (with-file (case (xrepl-ptcl-types:get-field opts 'file 'undefined)
                         ('undefined base)
-                        (file (maps:put #"file" (xrepl-protocol-types:ensure-binary file) base))))
-            (with-line (case (xrepl-protocol-types:get-field opts 'line 'undefined)
+                        (file (maps:put #"file" (xrepl-ptcl-types:ensure-binary file) base))))
+            (with-line (case (xrepl-ptcl-types:get-field opts 'line 'undefined)
                         ('undefined with-file)
                         (line (maps:put #"line" line with-file))))
-            (with-column (case (xrepl-protocol-types:get-field opts 'column 'undefined)
+            (with-column (case (xrepl-ptcl-types:get-field opts 'column 'undefined)
                           ('undefined with-line)
                           (col (maps:put #"column" col with-line))))
-            (with-include (case (xrepl-protocol-types:get-field opts 'include_declaration 'undefined)
+            (with-include (case (xrepl-ptcl-types:get-field opts 'include_declaration 'undefined)
                            ('undefined with-column)
                            (incl (maps:put #"include_declaration" incl with-column))))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            with-include 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -155,13 +155,13 @@
     (list-definitions-request #m(file \"src/foo.lfe\"))
     (list-definitions-request #m(module \"lists\"))"
   (let* ((base (maps:put #"op" #"list_definitions" #m()))
-         (with-file (case (xrepl-protocol-types:get-field opts 'file 'undefined)
+         (with-file (case (xrepl-ptcl-types:get-field opts 'file 'undefined)
                      ('undefined base)
-                     (file (maps:put #"file" (xrepl-protocol-types:ensure-binary file) base))))
-         (with-module (case (xrepl-protocol-types:get-field opts 'module 'undefined)
+                     (file (maps:put #"file" (xrepl-ptcl-types:ensure-binary file) base))))
+         (with-module (case (xrepl-ptcl-types:get-field opts 'module 'undefined)
                        ('undefined with-file)
-                       (mod (maps:put #"module" (xrepl-protocol-types:ensure-binary mod) with-file))))
-         (with-session (xrepl-protocol-types:maybe-put-aliased
+                       (mod (maps:put #"module" (xrepl-ptcl-types:ensure-binary mod) with-file))))
+         (with-session (xrepl-ptcl-types:maybe-put-aliased
                         with-module 'session 'session opts 'session)))
     with-session))
 
@@ -196,17 +196,17 @@
 
   Example:
     (symbol-at-point-request #m(file \"test.lfe\" line 10 column 5))"
-  (case (xrepl-protocol-types:get-required opts 'file)
+  (case (xrepl-ptcl-types:get-required opts 'file)
     (`#(ok ,file)
-     (case (xrepl-protocol-types:get-required opts 'line)
+     (case (xrepl-ptcl-types:get-required opts 'line)
        (`#(ok ,line)
-        (case (xrepl-protocol-types:get-required opts 'column)
+        (case (xrepl-ptcl-types:get-required opts 'column)
           (`#(ok ,column)
            (let* ((base (maps:put #"op" #"symbol_at_point"
-                                 (maps:put #"file" (xrepl-protocol-types:ensure-binary file)
+                                 (maps:put #"file" (xrepl-ptcl-types:ensure-binary file)
                                           (maps:put #"line" line
                                                    (maps:put #"column" column #m())))))
-                  (with-session (xrepl-protocol-types:maybe-put-aliased
+                  (with-session (xrepl-ptcl-types:maybe-put-aliased
                                  base 'session 'session opts 'session)))
              with-session))
           (error error)))
@@ -242,12 +242,12 @@
 
   Example:
     (workspace-symbols-request #m(query \"map\"))"
-  (case (xrepl-protocol-types:get-required opts 'query)
+  (case (xrepl-ptcl-types:get-required opts 'query)
     (`#(ok ,query)
      (let* ((base (maps:put #"op" #"workspace_symbols"
-                           (maps:put #"query" (xrepl-protocol-types:ensure-binary query)
+                           (maps:put #"query" (xrepl-ptcl-types:ensure-binary query)
                                     #m())))
-            (with-session (xrepl-protocol-types:maybe-put-aliased
+            (with-session (xrepl-ptcl-types:maybe-put-aliased
                            base 'session 'session opts 'session)))
        with-session))
     (error error)))
@@ -279,11 +279,11 @@
   Returns:
     #(ok parsed-request) | #(error reason)"
   (try
-    (let ((op (xrepl-protocol-types:get-field message 'op)))
+    (let ((op (xrepl-ptcl-types:get-field message 'op)))
       (cond
         ;; find_definition operation
         ((or (== op #"find_definition") (== op 'find_definition))
-         (let ((symbol (xrepl-protocol-types:get-field message 'symbol)))
+         (let ((symbol (xrepl-ptcl-types:get-field message 'symbol)))
            (if (== symbol 'undefined)
              (tuple 'error 'missing-symbol)
              (tuple 'ok (maps:put #"op" #"find_definition"
@@ -291,7 +291,7 @@
 
         ;; find_references operation
         ((or (== op #"find_references") (== op 'find_references))
-         (let ((symbol (xrepl-protocol-types:get-field message 'symbol)))
+         (let ((symbol (xrepl-ptcl-types:get-field message 'symbol)))
            (if (== symbol 'undefined)
              (tuple 'error 'missing-symbol)
              (tuple 'ok (maps:put #"op" #"find_references"
@@ -307,7 +307,7 @@
 
         ;; workspace_symbols operation
         ((or (== op #"workspace_symbols") (== op 'workspace_symbols))
-         (let ((query (xrepl-protocol-types:get-field message 'query)))
+         (let ((query (xrepl-ptcl-types:get-field message 'query)))
            (if (== query 'undefined)
              (tuple 'error 'missing-query)
              (tuple 'ok (maps:put #"op" #"workspace_symbols"
@@ -327,13 +327,13 @@
 
   Returns:
     #(ok result-map) | #(error error-info)"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (cond
       ((or (== status #"done") (== status 'done))
        (tuple 'ok message))  ;; Simple pass-through for now
 
       ((or (== status #"error") (== status 'error))
-       (tuple 'error (xrepl-protocol-types:get-field message 'error)))
+       (tuple 'error (xrepl-ptcl-types:get-field message 'error)))
 
       ('true (tuple 'error 'invalid-status)))))
 
@@ -358,7 +358,7 @@
 
   Returns:
     true | false"
-  (let ((status (xrepl-protocol-types:get-field message 'status)))
+  (let ((status (xrepl-ptcl-types:get-field message 'status)))
     (or (== status #"done")
         (== status 'done)
         (== status #"error")
@@ -375,4 +375,4 @@
 
   Returns:
     Error response map"
-  (xrepl-protocol-types:error-response error-type message))
+  (xrepl-ptcl-types:error-response error-type message))
