@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-compilation
+(defmodule xrepl-ptcl-ops-comp
   "Compilation operation protocol messages.
 
   This module defines all compilation operations in the xrepl protocol."

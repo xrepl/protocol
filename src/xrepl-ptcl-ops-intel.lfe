@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-intelligence
+(defmodule xrepl-ptcl-ops-intel
   "Code intelligence operation protocol messages.
 
   This module defines all code intelligence operations in the xrepl protocol."

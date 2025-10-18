@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-session
+(defmodule xrepl-ptcl-ops-sess
   "Session management operation protocol messages.
 
   This module defines all session management operations in the xrepl protocol."

@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-system
+(defmodule xrepl-ptcl-ops-sys
   "System operation protocol messages.
 
   This module defines all system/meta operations in the xrepl protocol."

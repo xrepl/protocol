@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-refactoring
+(defmodule xrepl-ptcl-ops-refac
   "Refactoring operation protocol messages.
 
   This module defines all refactoring operations in the xrepl protocol."

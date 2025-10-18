@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-debugging
+(defmodule xrepl-ptcl-ops-debug
   "Debugging operation protocol messages.
 
   This module defines all debugging operations in the xrepl protocol."

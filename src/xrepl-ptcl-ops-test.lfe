@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-testing
+(defmodule xrepl-ptcl-ops-test
   "Testing operation protocol messages.
 
   This module defines all testing operations in the xrepl protocol."

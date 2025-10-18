@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-evaluation
+(defmodule xrepl-ptcl-ops-eval
   "Evaluation operation protocol messages.
 
   This module defines all code evaluation operations in the xrepl protocol."

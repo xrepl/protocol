@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-navigation
+(defmodule xrepl-ptcl-ops-nav
   "Navigation operation protocol messages.
 
   This module defines all code navigation operations in the xrepl protocol."

@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-documentation
+(defmodule xrepl-ptcl-ops-doc
   "Documentation operation protocol messages.
 
   This module defines all documentation operations in the xrepl protocol."

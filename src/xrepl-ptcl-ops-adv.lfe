@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-advanced
+(defmodule xrepl-ptcl-ops-adv
   "Advanced operation protocol messages.
 
   This module defines advanced operations including macros, history, profiling,

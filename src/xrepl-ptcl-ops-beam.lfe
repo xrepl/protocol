@@ -1,4 +1,4 @@
-(defmodule xrepl-ops-beam
+(defmodule xrepl-ptcl-ops-beam
   "BEAM-specific operation protocol messages.
 
   This module defines BEAM VM introspection and management operations."
