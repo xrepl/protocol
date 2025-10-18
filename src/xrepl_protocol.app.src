@@ -1,0 +1,16 @@
+{application, xrepl_protocol, [
+    {description, "Wire protocol definitions and encoding/decoding utilities for xrepl communications"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {applications, [
+        kernel,
+        stdlib,
+        msgpack
+    ]},
+    {env, []},
+    {modules, []},
+    {licenses, ["Apache-2.0"]},
+    {links, [
+        {"GitHub", "https://github.com/lfex/xrepl-protocol"}
+    ]}
+]}.
