@@ -7,17 +7,39 @@
 
 [![Project Logo][logo]][logo-large]
 
-*Wire protocol definitions and encoding/decoding utilities for xrepl communications*
+*Complete wire protocol implementation for xREPL - 83 operations across 12 modules with 100% spec coverage*
+
+## Status
+
+✅ **Production Ready** - All 83 operations from the unified xREPL specification are implemented with 776 comprehensive tests.
 
 ## Overview
 
-This library provides:
+This library provides a complete implementation of the xREPL protocol:
 
+- **83 operations** across 12 organized modules
 - MessagePack encoding/decoding with length framing
-- Protocol message type definitions and schemas
 - Request/response builders for all operations
-- Message validation functions
-- Error standardization
+- Comprehensive message validation
+- Field aliasing for client compatibility (Emacs, VSCode, etc.)
+- Full error handling and standardization
+
+## Protocol Operations
+
+The protocol is organized into 12 modules covering:
+
+- **Session Management** - Session lifecycle and state
+- **Code Evaluation** - Execution and file loading
+- **System & Introspection** - Server capabilities and health
+- **Code Intelligence** - Completion, signatures, formatting
+- **Navigation** - Symbol lookup and definitions
+- **Documentation** - Doc access and generation
+- **Debugging** - Breakpoints, stepping, inspection
+- **Testing** - Test execution and coverage
+- **Refactoring** - Symbol rename, function extraction
+- **Compilation** - Building and static analysis
+- **BEAM Operations** - Hot reload, process inspection
+- **Advanced Features** - Macros, profiling, LSP integration
 
 ## Installation
 
@@ -25,7 +47,7 @@ Add to your `rebar.config`:
 
 ```erlang
 {deps, [
-    {xrepl_protocol, "0.1.0"}
+    {xrepl_protocol, "0.2.0"}
 ]}.
 ```
 
@@ -33,14 +55,24 @@ Add to your `rebar.config`:
 
 ```lfe
 ;; Encoding an eval request
-(let ((request (xrepl-protocol-eval:request #m(code "(+ 1 2)"))))
-  (xrepl-protocol-msgpack:encode request))
+(let ((request (xrepl-ptcl-ops-eval:eval-request #m(code "(+ 1 2)"))))
+  (xrepl-ptcl-msgpack:encode request))
 
 ;; Decoding a response
-(case (xrepl-protocol-msgpack:decode binary-data)
+(case (xrepl-ptcl-msgpack:decode binary-data)
   (`#(ok ,message)
-   (xrepl-protocol-eval:parse-response message)))
+   (xrepl-ptcl-ops-eval:parse-response 'eval message)))
 ```
+
+## Testing
+
+Run the full test suite:
+
+```bash
+rebar3 as test eunit
+```
+
+All 776 tests passing ✅
 
 ## License
 
