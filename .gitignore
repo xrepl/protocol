@@ -15,3 +15,12 @@ deps
 .rebar3
 _build/
 _checkouts/
+
+# Erlang
+rebar3.crashdump
+
+# Misc
+COMMIT_MSG.txt
+
+# AI
+.claude

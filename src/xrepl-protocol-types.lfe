@@ -7,8 +7,14 @@
    (validate-field 2)
    (get-field 2)
    (get-field 3)
+   (get-field-any 2)
+   (get-field-any 3)
    (get-required 2)
-   (ensure-binary 1)))
+   (ensure-binary 1)
+   (ensure-binary-key 1)
+   (put-aliased 4)
+   (put-aliased-list 4)
+   (maybe-put-aliased 5)))
 
 ;; Message envelope structure
 (defun message-envelope ()
@@ -64,8 +70,8 @@
 (defun get-field (map key default)
   "Get field from message map with default.
 
-  MessagePack sends keys as binaries, but LFE code uses atoms.
-  This function tries both representations.
+  MessagePack sends keys as binaries, but LFE code may use atoms.
+  This function tries both representations for backwards compatibility.
 
   Args:
     map: Message map
@@ -74,10 +80,11 @@
 
   Returns:
     Value or default"
-  (case (maps:get (ensure-binary-key key) map 'undefined)
-    ('undefined
-     (maps:get key map default))
-    (value value)))
+  (let ((bin-key (ensure-binary-key key)))
+    (case (maps:get bin-key map 'undefined)
+      ('undefined
+       (maps:get key map default))
+      (value value))))
 
 (defun get-required (map key)
   "Get required field from map or return error tuple.
@@ -101,19 +108,119 @@
   Returns:
     Binary representation"
   (cond
-    ((is_binary value) value)
-    ((is_list value) (list_to_binary value))
-    ((is_atom value) (atom_to_binary value 'utf8))
-    ('true (list_to_binary (io_lib:format "~p" (list value))))))
+   ((is_binary value) value)
+   ((is_list value)
+    ;; Check if it's a string (list of integers)
+    (if (io_lib:printable_list value)
+      (list_to_binary value)
+      ;; It's a list structure - format it
+      (list_to_binary (io_lib:format "~p" (list value)))))
+   ((is_atom value) (atom_to_binary value 'utf8))
+   ((is_integer value) (integer_to_binary value))
+   ((is_float value) (float_to_binary value))
+   ('true (list_to_binary (io_lib:format "~p" (list value))))))
 
 (defun ensure-binary-key (key)
-  "Convert atom key to binary for MessagePack compatibility.
+  "Convert any key to binary for MessagePack compatibility.
 
   Args:
-    key: Atom key
+    key: Atom, binary, or string key
 
   Returns:
     Binary key"
-  (if (is_binary key)
-    key
-    (list_to_binary (atom_to_list key))))
+  (cond
+   ((is_binary key) key)
+   ((is_atom key) (atom_to_binary key 'utf8))
+   ((is_list key) (list_to_binary key))
+   ('true (error (tuple 'badarg key)))))
+
+(defun get-field-any (map keys)
+  "Get field trying multiple key names (for aliases).
+
+  Args:
+    map: Message map
+    keys: List of possible key names (atoms or binaries)
+
+  Returns:
+    Value or 'undefined
+
+  Example:
+    (get-field-any msg '(candidate text))  ; tries both names"
+  (get-field-any map keys 'undefined))
+
+(defun get-field-any (map keys default)
+  "Get field trying multiple key names with default.
+
+  Args:
+    map: Message map
+    keys: List of possible key names (atoms or binaries)
+    default: Default value if not found
+
+  Returns:
+    Value or default"
+  (case keys
+    ('() default)
+    ((cons key rest)
+     ;; Try both binary and atom key for each candidate
+     (let ((val (get-field map key 'undefined)))
+       (case val
+         ('undefined (get-field-any map rest default))
+         (_ val))))))
+
+(defun put-aliased (map key1 key2 value)
+  "Put value under two key names for compatibility.
+
+  Args:
+    map: Map to update
+    key1: Primary key name (atom)
+    key2: Alias key name (atom)
+    value: Value to store
+
+  Returns:
+    Updated map with both keys
+
+  Example:
+    (put-aliased #m() 'candidate 'text #\"hello\")
+    ; => #m(#\"candidate\" #\"hello\" #\"text\" #\"hello\")"
+  (let ((bin-key1 (ensure-binary-key key1))
+        (bin-key2 (ensure-binary-key key2))
+        (bin-val (if (is_atom value)
+                   (atom_to_binary value 'utf8)
+                   value)))
+    (maps:put bin-key2 bin-val
+              (maps:put bin-key1 bin-val map))))
+
+(defun put-aliased-list (map key1 key2 values)
+  "Put list value under two key names for compatibility.
+
+  Args:
+    map: Map to update
+    key1: Primary key name (atom)
+    key2: Alias key name (atom)
+    values: List of values (will NOT be converted to binary)
+
+  Returns:
+    Updated map with both keys"
+  (let ((bin-key1 (ensure-binary-key key1))
+        (bin-key2 (ensure-binary-key key2)))
+    (maps:put bin-key2 values
+              (maps:put bin-key1 values map))))
+
+(defun maybe-put-aliased (map key1 key2 opts opt-key)
+  "Conditionally put aliased field if present in opts.
+
+  Args:
+    map: Map to potentially update
+    key1: Primary key name
+    key2: Alias key name
+    opts: Options map
+    opt-key: Key to look for in opts
+
+  Returns:
+    Updated map if field present, otherwise original map
+
+  Example:
+    (maybe-put-aliased base 'session 'session_id opts 'session)"
+  (case (get-field opts opt-key 'undefined)
+    ('undefined map)
+    (value (put-aliased map key1 key2 (ensure-binary value)))))

@@ -54,3 +54,64 @@
   (let ((envelope (xrepl-protocol-types:message-envelope)))
     (is (lists:member 'id envelope))
     (is (lists:member 'op envelope))))
+
+;; Tests for new helper functions added in Phase 0
+
+(deftest get-field-any-finds-first
+  (let ((msg #m(#"candidate" #"hello")))
+    (is-equal #"hello" (xrepl-protocol-types:get-field-any msg '(candidate text)))))
+
+(deftest get-field-any-finds-second
+  (let ((msg #m(#"text" #"hello")))
+    (is-equal #"hello" (xrepl-protocol-types:get-field-any msg '(candidate text)))))
+
+(deftest get-field-any-returns-default
+  (let ((msg #m()))
+    (is-equal 'not-found
+              (xrepl-protocol-types:get-field-any msg '(candidate text) 'not-found))))
+
+(deftest get-field-any-returns-undefined
+  (let ((msg #m()))
+    (is-equal 'undefined
+              (xrepl-protocol-types:get-field-any msg '(candidate text)))))
+
+(deftest put-aliased-creates-both-keys
+  (let ((result (xrepl-protocol-types:put-aliased #m() 'candidate 'text #"hello")))
+    (is-equal #"hello" (maps:get #"candidate" result))
+    (is-equal #"hello" (maps:get #"text" result))))
+
+(deftest put-aliased-converts-atom-value
+  (let ((result (xrepl-protocol-types:put-aliased #m() 'status 'state 'done)))
+    (is-equal #"done" (maps:get #"status" result))
+    (is-equal #"done" (maps:get #"state" result))))
+
+(deftest put-aliased-list-creates-both-keys
+  (let* ((test-values '(#"item1" #"item2"))
+         (result (xrepl-protocol-types:put-aliased-list #m() 'items 'list test-values)))
+    (is-equal test-values (maps:get #"items" result))
+    (is-equal test-values (maps:get #"list" result))))
+
+(deftest ensure-binary-key-conversions
+  (is-equal #"test" (xrepl-protocol-types:ensure-binary-key 'test))
+  (is-equal #"test" (xrepl-protocol-types:ensure-binary-key #"test"))
+  (is-equal #"test" (xrepl-protocol-types:ensure-binary-key "test")))
+
+(deftest maybe-put-aliased-adds-when-present
+  (let* ((opts #m(#"session" #"abc123"))
+         (result (xrepl-protocol-types:maybe-put-aliased #m() 'session 'session_id opts 'session)))
+    (is-equal #"abc123" (maps:get #"session" result))
+    (is-equal #"abc123" (maps:get #"session_id" result))))
+
+(deftest maybe-put-aliased-skips-when-absent
+  (let* ((opts #m())
+         (base #m(#"existing" #"value"))
+         (result (xrepl-protocol-types:maybe-put-aliased base 'session 'session_id opts 'session)))
+    (is-equal #"value" (maps:get #"existing" result))
+    (is-equal 'undefined (maps:get #"session" result 'undefined))))
+
+(deftest ensure-binary-handles-integers
+  (is-equal #"42" (xrepl-protocol-types:ensure-binary 42)))
+
+(deftest ensure-binary-handles-floats
+  (let ((result (xrepl-protocol-types:ensure-binary 3.14)))
+    (is (is_binary result))))
