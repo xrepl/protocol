@@ -24,3 +24,6 @@ COMMIT_MSG.txt
 
 # AI
 .claude
+
+# Local Git worktrees
+.worktrees/

@@ -74,6 +74,15 @@ rebar3 as test eunit
 
 All 776 tests passing ✅
 
+## Planning
+
+Project plans and historical design/progress records live on the orphan
+[`planning` branch](https://github.com/xrepl/protocol/tree/planning), under
+[`project01-mvp`](https://github.com/xrepl/protocol/blob/planning/project01-mvp/project-plan.md).
+The local planning worktree is `.worktrees/planning`; read its `README.md`
+and project plan before continuing planned work. The project plan distinguishes
+historical implementation claims from acceptance evidence.
+
 ## License
 
 Apache 2.0
