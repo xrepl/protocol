@@ -1,0 +1,486 @@
+{
+  "schema": 1,
+  "migration_date": "2026-10-17",
+  "source_repository": "git@github.com:xrepl/protocol.git",
+  "source_baseline": "0bfa6fd727da06338d064c7651de9b984bfabc23",
+  "spec_impl_tip": "c2ef69be064f74633bff12c00814ebf445efdd1c",
+  "identical_tree": "b88461be35411626bb97d6368a392fa1841b86f7",
+  "planning_branch": "planning",
+  "planning_worktree": ".worktrees/planning",
+  "project": "project01-mvp",
+  "files": [
+    {
+      "source": "IMPLEMENTATION_ANALYSIS.md",
+      "destination": "project01-mvp/artifacts/implementation/IMPLEMENTATION_ANALYSIS.md",
+      "sha256": "3cf5caf598cbff5e823a832f3282a924de0dce8efe3af626e5d65e23b2d7747a",
+      "bytes": 12049,
+      "lines": 313,
+      "tracked": false,
+      "source_commit": null
+    },
+    {
+      "source": "PR_MSG.md",
+      "destination": "project01-mvp/artifacts/implementation/PR_MSG.md",
+      "sha256": "09fe66163ae6da2908a83236aa10b905c6ad0211f1b96e063f8f089f03bf8b02",
+      "bytes": 11925,
+      "lines": 342,
+      "tracked": false,
+      "source_commit": null
+    },
+    {
+      "source": "SESSION_PROGRESS.md",
+      "destination": "project01-mvp/artifacts/implementation/SESSION_PROGRESS.md",
+      "sha256": "96bb3d2e960c56bad4c15c6d6854fba2eb83b6c326199632002e792b6b6f42e1",
+      "bytes": 16446,
+      "lines": 335,
+      "tracked": false,
+      "source_commit": null
+    },
+    {
+      "source": "docs/design/xrepl-protocol-extraction.md",
+      "destination": "project01-mvp/artifacts/design/xrepl-protocol-extraction.md",
+      "sha256": "85a05f8866b8f2cf386f56e130b13760853b27bcbd43a78071a369bce297d1bc",
+      "bytes": 33970,
+      "lines": 979,
+      "tracked": false,
+      "source_commit": null
+    },
+    {
+      "source": "docs/design/xrepl-protocol-impl-guide.md",
+      "destination": "project01-mvp/artifacts/design/xrepl-protocol-impl-guide.md",
+      "sha256": "c472163e4042e950aead22b2ba578aa3be66f3689bd3e0c7ff831055e39aa57f",
+      "bytes": 98017,
+      "lines": 2764,
+      "tracked": true,
+      "source_commit": "0bfa6fd727da06338d064c7651de9b984bfabc23"
+    },
+    {
+      "source": "docs/design/xrepl-protocol-impl-master-plan.md",
+      "destination": "project01-mvp/artifacts/design/xrepl-protocol-impl-master-plan.md",
+      "sha256": "80acc5a8db1689f09ffb817f9167df43335a7f3d3b571379196d91afc937416b",
+      "bytes": 46984,
+      "lines": 1663,
+      "tracked": false,
+      "source_commit": null
+    },
+    {
+      "source": "docs/design/xrepl-unified-spec.md",
+      "destination": "project01-mvp/artifacts/design/xrepl-unified-spec.md",
+      "sha256": "0db480675b458f855ddcbbe858f5d3a6f9438806b22315ae16c1d1e98c1603fd",
+      "bytes": 64752,
+      "lines": 3516,
+      "tracked": false,
+      "source_commit": null
+    },
+    {
+      "source": "spec-func-sigs-clean.lfe",
+      "destination": "project01-mvp/artifacts/implementation/spec-func-sigs-clean.lfe",
+      "sha256": "8f93d316bd4cf3a739fa9a96ddf31c02ca3c3752d74faa6f236053552c19ea96",
+      "bytes": 9638,
+      "lines": 173,
+      "tracked": false,
+      "source_commit": null
+    },
+    {
+      "source": "spec-func-sigs.lfe",
+      "destination": "project01-mvp/artifacts/implementation/spec-func-sigs.lfe",
+      "sha256": "d6decea52bb368672f65ae05f486620163a692c99416821a0f0c0d7169f24efb",
+      "bytes": 10908,
+      "lines": 197,
+      "tracked": false,
+      "source_commit": null
+    }
+  ],
+  "implementation_baseline": {
+    ".github/workflows/cicd.yml": "ba2b3eeb381155cd7ba3bae5264d559e0e4fe17457c267d4fe8e460f4654daf6",
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "rebar.config": "c32a6685a65ce006026aae9ede5360294c667a6985c21dec48d2f68a502d97d4",
+    "rebar.lock": "30fc89fd4b6f988d4296492aa9421fcea47536dc734f39f1088e5359ca9d7fe5",
+    "src/xrepl-ptcl-msgpack.lfe": "1d1ddd73a5fca9626d08ac188e6266f6f1b768d2cf225a2cee85923471e4ab59",
+    "src/xrepl-ptcl-ops-adv.lfe": "5f2cf5ee8afb1bf72ce0daf94ffaa0d2e68da4b356e6e5aedec737a28812ee8a",
+    "src/xrepl-ptcl-ops-beam.lfe": "cfbde2639e236e1f54a192ed59afb6d9fbb5a3a5d52801a2d77f07c87958e9c1",
+    "src/xrepl-ptcl-ops-comp.lfe": "41f07b0fe3765f9e0a23c5da8dd5f65d446fd60fd8cbcf110cba62c36a349f5f",
+    "src/xrepl-ptcl-ops-debug.lfe": "bfef6035317b10497ba8dc1639f23f1f9696d6d8b4f3bb2a0bab57af30170f50",
+    "src/xrepl-ptcl-ops-doc.lfe": "c7639c16f44845b0c75bfdc6f009380b02b4211d4b96c5ff7c9fd117327c62cb",
+    "src/xrepl-ptcl-ops-eval.lfe": "4531a0cc062ffa669623111ef6ba727d8e2bb0a6c5ceea0d99cb2b15ee871dff",
+    "src/xrepl-ptcl-ops-intel.lfe": "e49596ef7127b7feadab40620206a585db26c74ec514e8bdcb34ac16c0dd8650",
+    "src/xrepl-ptcl-ops-nav.lfe": "cb42142b17ba64dfc32b6cda0bff6b300ab674801315c1f09fc9d0577ad2150e",
+    "src/xrepl-ptcl-ops-refac.lfe": "5b4da4649b432cd4fbfc86f6e7b8a5c4e50c5c1384cf57ce07f8755aaf7c4135",
+    "src/xrepl-ptcl-ops-sess.lfe": "2f43ff86a23ed160735d15d96760a29db077498dcb7eeaf24a7e97a42d0534ea",
+    "src/xrepl-ptcl-ops-sys.lfe": "1a98dbe21adc9dd9e623fddbfb77b2dcf5cb14b90ab91b90108bbd747313ca4d",
+    "src/xrepl-ptcl-ops-test.lfe": "4e13952fbb01b0b1b08fd45f08624bfe91451cd910afd5d794a9c36f64810618",
+    "src/xrepl-ptcl-types.lfe": "218f33fa3aaff9aa3ad43a14515a0ec7970d3c50bfc7550dd243003be6cd474b",
+    "src/xrepl_protocol.app.src": "38c8c8047422b2a1fcd0a7c0b02d612daeee804a95ae27c501649597c1672a3a",
+    "test/xrepl-ptcl-msgpack-tests.lfe": "cdfcd4a23fbcc50702658475bb3fe1d3397fcb23e11b063e847e1b8b9e895e6d",
+    "test/xrepl-ptcl-ops-adv-tests.lfe": "012a417e1e8414401815adf0b59489b4875f5fa9012a5b3a9dfdb391f7c85995",
+    "test/xrepl-ptcl-ops-beam-tests.lfe": "560e905c65fde585477330c5806bc6772c24477c7664e00589d923e62a042bf4",
+    "test/xrepl-ptcl-ops-comp-tests.lfe": "48eb4808507b1e0229e5302c55da2da41161e131ea017427312f144f711b9a50",
+    "test/xrepl-ptcl-ops-debug-tests.lfe": "53612ccd52a2892487c6898d51fe56b76176b9b6cbbe32957993736dbed45d12",
+    "test/xrepl-ptcl-ops-doc-tests.lfe": "0f9fa4aa5cef72fea7d93a87a1d0cf42a21cc90bf0bc0a18fb7ba13e76898cab",
+    "test/xrepl-ptcl-ops-eval-tests.lfe": "776cefbbebbd4b9a12b2626ce9c367def577dc2f6b885af41812c6a4f56f1bbb",
+    "test/xrepl-ptcl-ops-intel-tests.lfe": "fe21b79d4cbc0e2ae5f3b4edcc13820a8892c4a95cd11cef029736d62f62f27b",
+    "test/xrepl-ptcl-ops-nav-tests.lfe": "59d9f21b7a8e8e636e289242b9b1668c2a752c4f992611cf93c9c68d6dbca9e7",
+    "test/xrepl-ptcl-ops-refac-tests.lfe": "bda1876bc134a884a4200359a027cfa3c3a012f46660fdc301f5e9220b5e5d98",
+    "test/xrepl-ptcl-ops-sess-tests.lfe": "d3404c8a15617de02dfd9bbd3b5c4c9a8850be67a3cd02ce097f5ee3cccb5273",
+    "test/xrepl-ptcl-ops-sys-tests.lfe": "d818995e706c4dce93b876696e36f48885904cfb23663f9a55d7b7e3d8013509",
+    "test/xrepl-ptcl-ops-test-tests.lfe": "7bc0bed2d6ce28609974d8dbf5c8ce73e1098c5769321629f7c3e2e4f1324878",
+    "test/xrepl-ptcl-types-tests.lfe": "b114701f96a83eaa4728b482bf4f9e7e084b5581a9ef93d79a14cc39d1088220"
+  },
+  "scope_units": [
+    {
+      "path": "arc01-wire-and-core/slice01-wire-foundation",
+      "kind": "foundation",
+      "operations": [],
+      "sources": [
+        "src/xrepl-ptcl-msgpack.lfe",
+        "src/xrepl-ptcl-types.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-msgpack-tests.lfe",
+        "test/xrepl-ptcl-types-tests.lfe"
+      ],
+      "guide_lines": [
+        81,
+        293
+      ],
+      "progress_lines": [
+        11,
+        20
+      ]
+    },
+    {
+      "path": "arc01-wire-and-core/slice02-evaluation",
+      "kind": "eval",
+      "operations": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-eval.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-eval-tests.lfe"
+      ],
+      "guide_lines": [
+        300,
+        1206
+      ],
+      "progress_lines": [
+        21,
+        32
+      ]
+    },
+    {
+      "path": "arc01-wire-and-core/slice03-sessions",
+      "kind": "sess",
+      "operations": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        66
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-sess.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-sess-tests.lfe"
+      ],
+      "guide_lines": [
+        1207,
+        1724
+      ],
+      "progress_lines": [
+        33,
+        44
+      ]
+    },
+    {
+      "path": "arc01-wire-and-core/slice04-system",
+      "kind": "sys",
+      "operations": [
+        60,
+        61,
+        62,
+        63,
+        64,
+        65
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-sys.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-sys-tests.lfe"
+      ],
+      "guide_lines": [
+        1725,
+        2040
+      ],
+      "progress_lines": [
+        45,
+        55
+      ]
+    },
+    {
+      "path": "arc02-editor-services/slice01-intelligence",
+      "kind": "intel",
+      "operations": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-intel.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-intel-tests.lfe"
+      ],
+      "guide_lines": [
+        2041,
+        2422
+      ],
+      "progress_lines": [
+        56,
+        75
+      ]
+    },
+    {
+      "path": "arc02-editor-services/slice02-navigation",
+      "kind": "nav",
+      "operations": [
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-nav.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-nav-tests.lfe"
+      ],
+      "guide_lines": [
+        2423,
+        2446
+      ],
+      "progress_lines": [
+        76,
+        88
+      ]
+    },
+    {
+      "path": "arc02-editor-services/slice03-documentation",
+      "kind": "doc",
+      "operations": [
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-doc.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-doc-tests.lfe"
+      ],
+      "guide_lines": [
+        2423,
+        2446
+      ],
+      "progress_lines": [
+        89,
+        99
+      ]
+    },
+    {
+      "path": "arc03-development-tools/slice01-debugging",
+      "kind": "debug",
+      "operations": [
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-debug.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-debug-tests.lfe"
+      ],
+      "guide_lines": [
+        2423,
+        2446
+      ],
+      "progress_lines": [
+        100,
+        112
+      ]
+    },
+    {
+      "path": "arc03-development-tools/slice02-testing",
+      "kind": "test",
+      "operations": [
+        42,
+        43,
+        44,
+        45
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-test.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-test-tests.lfe"
+      ],
+      "guide_lines": [
+        2423,
+        2446
+      ],
+      "progress_lines": [
+        113,
+        126
+      ]
+    },
+    {
+      "path": "arc03-development-tools/slice03-refactoring",
+      "kind": "refac",
+      "operations": [
+        46,
+        47,
+        48
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-refac.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-refac-tests.lfe"
+      ],
+      "guide_lines": [
+        2423,
+        2446
+      ],
+      "progress_lines": [
+        127,
+        135
+      ]
+    },
+    {
+      "path": "arc03-development-tools/slice04-compilation",
+      "kind": "comp",
+      "operations": [
+        49,
+        50,
+        51,
+        52,
+        53
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-comp.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-comp-tests.lfe"
+      ],
+      "guide_lines": [
+        2423,
+        2446
+      ],
+      "progress_lines": [
+        136,
+        146
+      ]
+    },
+    {
+      "path": "arc04-platform-operations/slice01-beam",
+      "kind": "beam",
+      "operations": [
+        54,
+        55,
+        56,
+        57,
+        58,
+        59
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-beam.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-beam-tests.lfe"
+      ],
+      "guide_lines": [
+        2423,
+        2446
+      ],
+      "progress_lines": [
+        147,
+        159
+      ]
+    },
+    {
+      "path": "arc04-platform-operations/slice02-advanced",
+      "kind": "adv",
+      "operations": [
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83
+      ],
+      "sources": [
+        "src/xrepl-ptcl-ops-adv.lfe"
+      ],
+      "tests": [
+        "test/xrepl-ptcl-ops-adv-tests.lfe"
+      ],
+      "guide_lines": [
+        2423,
+        2446
+      ],
+      "progress_lines": [
+        160,
+        182
+      ]
+    },
+    {
+      "path": "slice01-composition-and-release",
+      "kind": "composition",
+      "operations": [],
+      "sources": [
+        "README.md",
+        "rebar.config",
+        "src/xrepl_protocol.app.src"
+      ],
+      "tests": []
+    }
+  ]
+}
