@@ -11,7 +11,7 @@
 
 ## Status
 
-✅ **Production Ready** - All 83 operations from the unified xREPL specification are implemented with 776 comprehensive tests.
+✅ **Production Ready** - All 83 operations from the unified xREPL specification are implemented with 713 comprehensive tests.
 
 ## Overview
 
@@ -70,9 +70,12 @@ Run the full test suite:
 
 ```bash
 rebar3 as test eunit
+
+# Run the suite and generate its coverage report
+rebar3 as test coverage
 ```
 
-All 776 tests passing ✅
+All 713 tests passing ✅
 
 ## Planning
 
@@ -95,7 +98,7 @@ Apache 2.0
 [gh-actions]: https://github.com/xrepl/protocol/actions/workflows/cicd.yml
 [lfe]: https://github.com/lfe/lfe
 [lfe-badge]: https://img.shields.io/badge/lfe-2.2-blue.svg
-[erlang-badge]: https://img.shields.io/badge/erlang-24%20to%2028-blue.svg
+[erlang-badge]: https://img.shields.io/badge/erlang-24%20to%2029-blue.svg
 [version]: https://github.com/xrepl/protocol/blob/main/.github/workflows/cicd.yml
 [github-tags]: https://github.com/xrepl/protocol/tags
 [github-tags-badge]: https://img.shields.io/github/tag/lfe/xrepl.svg
