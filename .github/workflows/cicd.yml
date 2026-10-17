@@ -14,7 +14,7 @@ on:
 jobs:
   builds:
     name: Erlang ${{ matrix.otp_version }} build
-    # OTP 24 and 25 are available on this image; ubuntu-latest can move on.
+    # OTP 25 is available on this image; ubuntu-latest can move on.
     runs-on: ubuntu-24.04
 
     strategy:
@@ -31,8 +31,6 @@ jobs:
             rebar3_version: '3.22.1'
           - otp_version: '25'
             rebar3_version: '3.22.1'
-          - otp_version: '24'
-            rebar3_version: '3.21.0'
 
     steps:
     - uses: actions/checkout@v4

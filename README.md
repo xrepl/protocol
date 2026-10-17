@@ -66,6 +66,9 @@ Add to your `rebar.config`:
 
 ## Testing
 
+CI covers Erlang/OTP 25 through 29. OTP 24 is no longer supported by the
+current LFE compiler and build plugin dependencies.
+
 Run the full test suite:
 
 ```bash
@@ -98,7 +101,7 @@ Apache 2.0
 [gh-actions]: https://github.com/xrepl/protocol/actions/workflows/cicd.yml
 [lfe]: https://github.com/lfe/lfe
 [lfe-badge]: https://img.shields.io/badge/lfe-2.2-blue.svg
-[erlang-badge]: https://img.shields.io/badge/erlang-24%20to%2029-blue.svg
+[erlang-badge]: https://img.shields.io/badge/erlang-25%20to%2029-blue.svg
 [version]: https://github.com/xrepl/protocol/blob/main/.github/workflows/cicd.yml
 [github-tags]: https://github.com/xrepl/protocol/tags
 [github-tags-badge]: https://img.shields.io/github/tag/lfe/xrepl.svg
